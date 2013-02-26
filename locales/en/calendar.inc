@@ -57,6 +57,7 @@
 'new event',
 'New Event',
 'next month',
+'Note',
 'Overdue',
 'P',
 'Parent Task',
