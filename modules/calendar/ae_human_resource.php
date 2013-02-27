@@ -4,8 +4,7 @@
 		die('You should not access this file directly.');
 	}
 
-// $Id: ae_resource.php 6048 2010-10-06 10:01:39Z ajdonnison $
-	global $AppUI, $users, $event_id, $obj, $currentTabId;
+	global $AppUI, $users, $event_id, $obj, $currentTabId, $is_clash;
 
 // Load the assignees
 	$assigned = array();
