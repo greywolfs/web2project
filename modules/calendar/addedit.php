@@ -115,7 +115,17 @@ $end_date = intval($obj->event_end_date) ? new w2p_Utilities_Date($AppUI->format
 
 $recurs = array('Never', 'Hourly', 'Daily', 'Weekly', 'Bi-Weekly', 'Every Month', 'Quarterly', 'Every 6 months', 'Every Year');
 
-$remind = array('900' => '15 mins', '1800' => '30 mins', '3600' => '1 hour', '7200' => '2 hours', '14400' => '4 hours', '28800' => '8 hours', '56600' => '16 hours', '86400' => '1 day', '172800' => '2 days');
+$remind = array (
+	"900" => '15 '.$AppUI->_('mins'),
+	"1800" => '30 '.$AppUI->_('mins'),
+	"3600" => '1 '.$AppUI->_('hour'),
+	"7200" => '2 '.$AppUI->_('hours'),
+	"14400" => '4 '.$AppUI->_('hours'),
+	"28800" => '8 '.$AppUI->_('hours'),
+//	"56600" => '16 '.$AppUI->_('hours'),
+	"86400" => '1 '.$AppUI->_('day'),
+	"172800" => '2 '.$AppUI->_('days')
+);
 
 // build array of times in 30 minute increments
 $times = array();
@@ -208,6 +218,10 @@ for ($minutes = 0; $minutes < ((24 * 60) / $inc); $minutes++) {
 					<?php echo arraySelect($recurs, 'event_recurs', 'size="1" class="text"', $obj->event_recurs, true); ?>
 					&nbsp;&nbsp;&nbsp; x<input type="text" class="text" name="event_times_recuring" value="<?php echo ((isset($obj->event_times_recuring)) ? ($obj->event_times_recuring) : '1'); ?>" maxlength="2" size="3" /> <?php echo $AppUI->_('times'); ?>
 				</td>
+			</tr>
+			<tr>
+				<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Remind Me'); ?>:</td>
+				<td><?php echo arraySelect($remind, 'event_remind', 'size="1" class="text"', $obj->event_remind); ?> <?php echo $AppUI->_('in advance'); ?></td>
 			</tr>
 			<tr>
 				<td align="right" nowrap="nowrap"><label for="event_cwd"><?php echo $AppUI->_('Show only on Working Days'); ?>:</label></td>
