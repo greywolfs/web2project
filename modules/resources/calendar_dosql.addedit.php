@@ -38,16 +38,17 @@ function checkClashOtherResource($resourceList = null) {
 		return false;
 	}
 
-	$start_date = new CDate($AppUI->convertToSystemTZ($obj->event_start_date));
-	$end_date = new CDate($AppUI->convertToSystemTZ($obj->event_end_date));
+	$start_date = new w2p_Utilities_Date($AppUI->convertToSystemTZ($obj->event_start_date));
+	$end_date = new w2p_Utilities_Date($AppUI->convertToSystemTZ($obj->event_end_date));
 
 	// Now build a query to find matching events.
-	$q  = new DBQuery;
+	$q  = new w2p_Database_Query;
 	$q->addTable('events', 'e');
-	$q->addQuery('ue.resource_id, ue.resource_name, type.resource_type_name');
+	$q->addQuery('ue.resource_id, ue.resource_name, type.sysval_value');
 	$q->addJoin('event_resources', 'e1', 'e1.event_id = e.event_id');
 	$q->addJoin('resources', 'ue', 'ue.resource_id = e1.resource_id');
-	$q->addJoin('resource_types', 'type', 'ue.resource_type=type.resource_type_id');
+	$q->addJoin('sysvals', 'type', 'ue.resource_type=type.sysval_value_id');
+	$q->addWhere("sysval_title = 'ResourceTypes'");
 	$q->addWhere("event_start_date <= '" . $end_date->format(FMT_DATETIME_MYSQL) . "'");
 	$q->addWhere("event_end_date >= '" . $start_date->format(FMT_DATETIME_MYSQL) . "'");
 	$q->addWhere("ue.resource_id IN (" . implode(',', $resources) . ")");
@@ -62,7 +63,7 @@ function checkClashOtherResource($resourceList = null) {
 
 	$clashes = array();
 	while ($row = db_fetch_assoc($result)) {
-		$clashes[$row['resource_id']]= $AppUI->_($row['resource_type_name']).": ".$row['resource_name'];
+		$clashes[$row['resource_id']]= $AppUI->_($row['sysval_value']).": ".$row['resource_name'];
 	}
 	$clash = array_unique($clashes);
 	$q->clear();
