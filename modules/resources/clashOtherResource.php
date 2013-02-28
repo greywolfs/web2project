@@ -245,8 +245,7 @@ function clashOtherResource_process() {
 		$_GET['event_id'] = $obj->event_id;
 		$GLOBALS['a']='addedit';
 		$GLOBALS['m']='calendar';
-// load module based locale settings
-		include W2P_BASE_DIR . '/locales/core.php';
+		$AppUI->loadModuleLocalization('calendar');
 		$do_include = W2P_BASE_DIR . "/modules/calendar/addedit.php";
 		return;
 	}
@@ -321,9 +320,7 @@ function clashOtherResource_process() {
 				$_GET['event_id'] = $obj->event_id;
 				$GLOBALS['a']='addedit';
 				$GLOBALS['m']='calendar';
-// load module based locale settings
-				@include W2P_BASE_DIR . '/locales/' . $AppUI->user_locale . '/locales.php';
-				include W2P_BASE_DIR . '/locales/core.php';
+				$AppUI->loadModuleLocalization('calendar');
 				$do_include = W2P_BASE_DIR . '/modules/calendar/addedit.php';
 				return;
 			}
