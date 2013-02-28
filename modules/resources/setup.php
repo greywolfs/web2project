@@ -139,7 +139,7 @@ class SResource extends w2p_Core_Setup
         $q = new w2p_Database_Query();
 
         $i = 1;
-        $resourceTypes = array('All resources', 'Equipment', 'Tool', 'Venue');
+        $resourceTypes = array('Equipment', 'Tool', 'Venue');
         foreach ($resourceTypes as $type) {
             $q->addTable('sysvals');
             $q->addInsert('sysval_key_id', 1);

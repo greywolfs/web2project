@@ -8,11 +8,11 @@ require_once $AppUI->getModuleClass('calendar');
 if (isset($_REQUEST['clash_action'])) {
 	$do_include = false;
 	switch ($_REQUEST['clash_action']) {
-		case 'suggest':  clash_suggest(); break;
-		case 'process':  clash_process(); break;
-		case 'cancel' :  clash_cancel(); break;
-//		case 'mail'   :  clash_mail(); break;
-		case 'accept' :  clash_accept(); break;
+		case 'suggest':  clashOtherResource_suggest(); break;
+		case 'process':  clashOtherResource_process(); break;
+		case 'cancel' :  clashOtherResource_cancel(); break;
+//		case 'mail'   :  clashOtherResource_mail(); break;
+		case 'accept' :  clashOtherResource_accept(); break;
 		default       :  $AppUI->setMsg('Invalid action, event cancelled', UI_MSG_ALERT); break;
 	}
 	// Why do it here?  Because it is in the global scope and requires
@@ -39,6 +39,7 @@ if (isset($_REQUEST['clash_action'])) {
 	$_SESSION['add_event_post'] = get_object_vars($obj);
 	$_SESSION['add_event_clash'] = implode(',', array_keys($clash));
 	$_SESSION['add_event_caller'] = $last_a;
+	$_SESSION['add_event_attendees'] = $_POST['event_assigned'];
 	$_SESSION['add_event_resources'] = $_POST['other_resource'];
 	$_SESSION['add_event_mail'] = isset($_POST['mail_invited']) ? $_POST['mail_invited'] : 'off';
 
@@ -46,12 +47,13 @@ if (isset($_REQUEST['clash_action'])) {
 	foreach($clash as $resource) {
 		echo "<tr><td>$resource</td></tr>\n";
 	}
-	echo "</table>\n";
-	$calurl = DP_BASE_URL.'/index.php?m=resources&a=clashOtherResource&event_id=' . $obj->event_id;
+	echo "<tr><td>";
+	$calurl = W2P_BASE_URL.'/index.php?m=resources&a=clashOtherResource&event_id=' . $obj->event_id;
 	echo "<a href='#' onclick=\"set_clash_action('suggest');\">" . $AppUI->_('Suggest Alternative') . "</a> : ";
-	echo "<a href='#' onclick=\"set_clash_action('cancel');\">" . $AppUI->_('Cancel') . "</a> : ";
+	echo "<a href='#' onclick=\"set_clash_action('cancel');\">" . $AppUI->_('Cancel') . "</a>  ";
 //	echo "<a href='#' onclick=\"set_clash_action('mail');\">" . $AppUI->_('Mail Request') . "</a> : ";
-	echo "<a href='#' onclick=\"set_clash_action('accept');\">" . $AppUI->_('Book Event Despite Conflict') . "</a>\n";
+//	echo "<a href='#' onclick=\"set_clash_action('accept');\">" . $AppUI->_('Book Event Despite Conflict') . "</a>\n";
+	echo "</td></tr></table>\n";
 	echo "<form name='clash_form' method='POST' action='$calurl'>";
 	echo "<input type='hidden' name='clash_action' value='cancel'>";
 	echo "</form>\n";
@@ -63,7 +65,7 @@ if (isset($_REQUEST['clash_action'])) {
  * Cancel the event, simply clear the event details and return to the previous
  * page.
 */
-function clash_cancel()
+function clashOtherResource_cancel()
 {
 	global $AppUI, $a;
 	$a = $_SESSION['add_event_caller'];
@@ -75,14 +77,14 @@ function clash_cancel()
 /*
  * display a form
  */
-function clash_suggest()
+function clashOtherResource_suggest()
 {
 	global $AppUI, $m, $a;
 	$obj = new CEvent;
 	$obj->bind($_SESSION['add_event_post']);
 
-	$start_date = new CDate($obj->event_start_date);
-	$end_date = new CDate($obj->event_end_date);
+	$start_date = new w2p_Utilities_Date($obj->event_start_date);
+	$end_date = new w2p_Utilities_Date($obj->event_end_date);
 	$df = $AppUI->getPref('SHDATEFORMAT');
 	$start_secs = $start_date->getTime();
 	$end_secs = $end_date->getTime();
@@ -90,9 +92,9 @@ function clash_suggest()
 
 	$titleBlock = new CTitleBlock('Suggest Alternative Event Time', 'myevo-appointments.png', 'calendar', $m.'.'.$a);
 	$titleBlock->show();
-	$calurl = DP_BASE_URL . '/index.php?m=resources&a=clashOtherResource&event_id=' . $obj->event_id;
+	$calurl = W2P_BASE_URL . '/index.php?m=resources&a=clashOtherResource&event_id=' . $obj->event_id;
 	$times = array();
-	$t = new CDate();
+	$t = new w2p_Utilities_Date();
 	$t->setTime(0,0,0);
 	if (!defined('LOCALE_TIME_FORMAT'))
 		define('LOCALE_TIME_FORMAT', '%I:%M %p');
@@ -183,94 +185,151 @@ function clash_suggest()
  * Build an SQL to determine an appropriate time slot that will meet
  * The requirements for all participants, including the requestor.
  */
-function clash_process() {
-	global $AppUI, $do_include,$obj;
+function getEventsInWindowWithResource($start_date, $end_date, $resources = null)
+{
+	global $obj;
+	if (!isset($resources)) {
+		return false;
+	}
+	if (!count($resources)) {
+		return false;
+	}
 
-	$fname = (DP_BASE_DIR . '/modules/resources/calendar_dosql.addedit.php');
-	require_once $fname;
+	// Now build a query to find matching events.
+	$q = new w2p_Database_Query();
+	$q->addTable('events', 'e');
+	$q->addQuery("event_start_date, event_end_date");
+	$q->leftJoin("event_resources",'resource',array('event_id'));
+	$q->addWhere("event_start_date >= '$start_date' " .
+		"AND event_end_date <= '$end_date' " .
+		"AND resource.resource_id in (" . implode(',', $resources) . ")");
+
+	return $q->loadList();
+}
+function clashOtherResource_process() {
+	global $do_include, $AppUI,$obj;
+
+	require_once (W2P_BASE_DIR . '/modules/resources/calendar_dosql.addedit.php');
+
 	$obj = new CEvent;
 	$obj->bind($_SESSION['add_event_post']);
 	$resources = $_SESSION['add_event_resources'];
-	$resourcesForAdd = array();
+	$resource_list = array();
 	if (isset($resources) && $resources) {
-		$resourcesForAdd = explode(',', $resources);
+		$resource_list = explode(',', $resources);
 	}
 	// First remove any duplicates
-	$resourcesForAdd = array_unique($resourcesForAdd);
+	$resource_list = array_unique($resource_list);
 	// Now remove any null entries, so implode doesn't create a dud SQL
 	// Foreach is safer as it works on a copy of the array.
-	foreach ($resourcesForAdd as $key => $resource) {
+	foreach ($resource_list as $key => $resource) {
 		if (!($resource)) {
-			unset($resourcesForAdd[$key]);
+			unset($resource_list[$key]);
 		}
 	}
 
+	$start_date = new w2p_Utilities_Date($AppUI->convertToSystemTZ($_POST['event_start_date'] . $_POST['start_time']));
+	$end_date = new w2p_Utilities_Date($AppUI->convertToSystemTZ($_POST['event_end_date'] . $_POST['end_time']));
 
 	// First find any events in the range requested.
-	$start_date = new CDate($_POST['event_start_date'] . $_POST['start_time']);
-	$end_date = new CDate($_POST['event_start_date'] . $_POST['start_time']);
-	$end_date->addSeconds($_POST['duration'] * 60);
-	$final_date = new CDate($_POST['event_end_date'] . $_POST['end_time']);
+	$event_list = getEventsInWindowWithResource($start_date->format(FMT_DATETIME_MYSQL), $end_date->format(FMT_DATETIME_MYSQL), $resource_list);
 
-	$original_event_start = $obj->event_start_date;
-	$original_event_end = $obj->event_end_date;
-
-	$resources_list = implode(',', $resourcesForAdd);
+	if (!$event_list || !count($event_list)) {
+		// First available date/time is OK, seed addEdit with the details.
+		$obj->event_start_date = $start_date->format(FMT_DATETIME_MYSQL);
+		$start_date->addSeconds($_POST['duration']*60);
+		$obj->event_end_date = $start_date->format(FMT_DATETIME_MYSQL);
+		$_SESSION['add_event_post'] = get_object_vars($obj);
+		$AppUI->setMsg('No clashes in suggested timespan', UI_MSG_OK);
+		$_SESSION['event_is_clash'] = true;
+		$_GET['event_id'] = $obj->event_id;
+		$GLOBALS['a']='addedit';
+		$GLOBALS['m']='calendar';
+// load module based locale settings
+		include W2P_BASE_DIR . '/locales/core.php';
+		$do_include = W2P_BASE_DIR . "/modules/calendar/addedit.php";
+		return;
+	}
 
 	// Now we grab the events, in date order, and compare against the
 	// required start and end times.
 	// Working in 30 minute increments from the start time, and remembering
 	// the end time stipulation, find the first hole in the times.
-
 	// Determine the duration in hours/minutes.
-	$start_hour = (int)($_POST['start_time'] / 10000);
-	$start_minutes = (int)(($_POST['start_time'] % 10000) / 100);
-	$start_min_offset = ($start_hour * 60) + $start_minutes;
-	$end_hour = (int)($_POST['end_time'] / 10000);
-	$end_minutes = (int)(($_POST['end_time'] % 10000) / 100);
-	$end_min_offset = (($end_hour * 60) + $end_minutes) - $_POST['duration'];
+	$start_hour = (int)$start_date->format('%H');
+	$start_minutes = (int)$start_date->format('%M');
+	$start_time = $start_hour * 60 + $start_minutes;
+	$end_hour = (int)$end_date->format('%H');
+	$end_minutes = (int)$end_date->format('%M');
+	$end_time = ($end_hour * 60 + $end_minutes) - $_POST['duration'];
 
 	// First, build a set of "slots" that give us the duration
 	// and start/end times we need
 	$first_day = $start_date->format('%E');
-	$end_day = $final_date->format('%E');
-	$oneday = new Date_Span(array(1,0,0,0));
+	$end_day = $end_date->format('%E');
+	$days_between = ($end_day + 1) - $first_day;
+	$oneday = new Date_Span(array(1, 0, 0, 0));
 
 	$slots = array();
-	$curr_date = new CDate($start_date);
-	$curr_date->setTime(0, 0, 0);
-	$inc = intval(dPgetConfig('cal_day_increment')) ? intval(dPgetConfig('cal_day_increment')) : 30;
-	for ($i = 0; $i <= ($end_day - $first_day); $i++) {
-		if ($curr_date->isWorkingDay()) {
-			for ($j = $start_min_offset; $j <= $end_min_offset; $j += $inc) {
-				$is_committed = false;
-
-				$slot_start_date = new CDate($curr_date);
-				$slot_start_date->addSeconds($j * 60);
-				$slot_end_date = new CDate($slot_start_date);
-				$slot_end_date->addSeconds($_POST['duration'] * 60);
-
-				$obj->event_start_date = $slot_start_date->format('%Y-%m-%d %T');
-				$obj->event_end_date = $slot_end_date->format('%Y-%m-%d %T');
-
-				if (!($clash = checkClashOtherResource($resources_list))) {
-					$_SESSION['add_event_post'] = get_object_vars($obj);
-					$AppUI->setMsg('First available time slot', UI_MSG_OK);
-					$_SESSION['event_is_clash'] = true;
-					$_GET['event_id'] = $obj->event_id;
-					$do_include = DP_BASE_DIR.'/modules/calendar/addedit.php';
-					return;
-				}
-
+	$slot_count = 0;
+	$first_date = new w2p_Utilities_Date($start_date);
+	for ($i = 0; $i < $days_between; $i++) {
+		if ($first_date->isWorkingDay()) {
+			$slots[$i] = array();
+			for ($j = $start_time; $j <= $end_time; $j += 30) {
+				$slot_count++;
+				$slots[$i][] = array('date' => $first_date->format('%Y-%m-%d'), 'start_time' => $j, 'end_time' => $j + $_POST['duration'], 'committed' => false);
 			}
 		}
-		$curr_date->addSpan($oneday);
-		$curr_date->setTime(0, 0, 0);
+		$first_date->addSpan($oneday);
 	}
 
+	// Now process the events list
+	foreach ($event_list as $event) {
+		$sdate = new w2p_Utilities_Date($event['event_start_date']);
+		$edate = new w2p_Utilities_Date($event['event_end_date']);
+		$sday = $sdate->format('%E');
+		$day_offset = $sday - $first_day;
+
+		// Now find the slots on that day that match
+		list($syear, $smonth, $sday, $shour, $sminute, $ssecond) = sscanf($event['event_start_date'], "%4d-%2d-%2d %2d:%2d:%2d");
+		list($eyear, $emonth, $eday, $ehour, $eminute, $esecond) = sscanf($event['event_end_date'], "%4d-%2d-%2d %2d:%2d:%2d");
+		$start_mins = $shour * 60 + $sminute;
+		$end_mins = $ehour * 60 + $eminute;
+		if (isset($slots[$day_offset])) {
+			foreach ($slots[$day_offset] as $key => $slot) {
+				if ($start_mins <= $slot['end_time'] && $end_mins >= $slot['start_time']) {
+					$slots[$day_offset][$key]['committed'] = true;
+				}
+			}
+		}
+	}
+
+	// Third pass through, find the first uncommitted slot;
+	foreach ($slots as $day_offset => $day_slot) {
+		foreach ($day_slot as $slot) {
+			if (!$slot['committed']) {
+				$hour = (int)($slot['start_time'] / 60);
+				$min = $slot['start_time'] % 60;
+				$ehour = (int)($slot['end_time'] / 60);
+				$emin = $slot['end_time'] % 60;
+				$obj->event_start_date = $slot['date'] . ' ' . sprintf("%02d:%02d:00", $hour, $min);
+				$obj->event_end_date = $slot['date'] . ' ' . sprintf("%02d:%02d:00", $ehour, $emin);
+				$_SESSION['add_event_post'] = get_object_vars($obj);
+				$AppUI->setMsg('First available time slot', UI_MSG_OK);
+				$_SESSION['event_is_clash'] = true;
+				$_GET['event_id'] = $obj->event_id;
+				$GLOBALS['a']='addedit';
+				$GLOBALS['m']='calendar';
+// load module based locale settings
+				@include W2P_BASE_DIR . '/locales/' . $AppUI->user_locale . '/locales.php';
+				include W2P_BASE_DIR . '/locales/core.php';
+				$do_include = W2P_BASE_DIR . '/modules/calendar/addedit.php';
+				return;
+			}
+		}
+	}
 	// If we get here we have found no available slots
-	$obj->event_start_date = $original_event_start;
-	$obj->event_end_date = $original_event_end;
 	clear_clash();
 	$AppUI->setMsg('No times match your parameters', UI_MSG_ALERT);
 	$AppUI->redirect();
@@ -299,7 +358,7 @@ function clash_process() {
 /*
  * Even though we end up with a clash, accept the detail.
  */
-function clash_accept()
+function clashOtherResource_accept()
 {
 	global $AppUI, $do_redirect;
 
@@ -321,11 +380,12 @@ function clash_accept()
 	$AppUI->redirect();
 }
 
-function clear_clash()
+function clearOtherResource_clash()
 {
 	unset($_SESSION['add_event_caller']);
 	unset($_SESSION['add_event_post']);
 	unset($_SESSION['add_event_clash']);
+	unset($_SESSION['add_event_attendees']);
 	unset($_SESSION['add_event_resources']);
 	unset($_SESSION['add_event_mail']);
 }

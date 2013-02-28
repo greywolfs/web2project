@@ -6,23 +6,15 @@ if (!defined('DP_BASE_DIR')) {
 global $users, $event_id, $obj, $currentTabId,$is_clash;
 
 // Need to get all of the resources that this user is allowed to view
-require_once $this->_AppUI->getModuleClass('resources');
-$resource = new CResource;
+$resource = new CResource();
+$resources = $resource->loadAll();
 
-$resource_types =& $resource->typeSelect();
-$q = new DBQuery;
+$resource_types = w2PgetSysVal('ResourceTypes');
 
-$q->addTable('resources');
-$q->addOrder('resource_type', 'resource_name');
-$res = $q->exec();
 $all_resources = array();
-
-while ($row = db_fetch_assoc($res)) {
-	$type = $row['resource_type'];
+foreach($resources as $row) {
 	$all_resources[$row['resource_id']] = $this->_AppUI->_($resource_types[$row['resource_type']]) . ': ' . $row['resource_name'];
 }
-$q->clear();
-
 $assigned_resources = array();
 
 $resources = array();
@@ -39,7 +31,7 @@ if ($is_clash) {
 } else {
 	$initResAssignment = '';
 	// Pull resources on this task
-	$q = new DBQuery;
+	$q = new w2p_Database_Query;
 	$q->addTable('event_resources');
 	$q->addQuery('resource_id');
 	$q->addWhere('event_id = ' . $event_id);

@@ -14,7 +14,7 @@ $resource_types = w2PgetSysVal('ResourceTypes');
 
 $all_resources = array();
 foreach($resources as $row) {
-    $all_resources[$row['resource_id']] = $resource_types[$row['resource_type']] . ': ' . $row['resource_name'];
+    $all_resources[$row['resource_id']] = $AppUI->_($resource_types[$row['resource_type']]) . ': ' . $row['resource_name'];
 }
 
 $assigned_resources = array();
