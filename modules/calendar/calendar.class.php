@@ -216,6 +216,10 @@ class CEvent extends w2p_Core_BaseObject
 					$$query_set->addWhere('project_company = ' . $AppUI->getState('CalIdxCompany'));
 				}
 			}
+			if (($AppUI->getState('CalIdxResourceFilter'))) {
+				$$query_set->addJoin('event_resources', 'evres', 'evres.event_id =  e.event_id');
+				$$query_set->addWhere("(resource_id = '" . $AppUI->getState('CalIdxResourceFilter')."')");
+			}
 
 			if (count($allowedProjects)) {
 				$$query_set->addWhere('( ( ' . implode(' AND ', $allowedProjects) . ' ) ' . (($AppUI->getState('CalIdxCompany')) ? '' : ($project_id ? '' : ' OR event_project = 0 ')) . ')');

@@ -32,8 +32,20 @@ $company = new CCompany();
 $companies = $company->getAllowedRecords($AppUI->user_id, 'company_id,company_name', 'company_name');
 $companies = arrayMerge(array('0' => $AppUI->_('All')), $companies);
 
+require_once $AppUI->getModuleClass('resources');
+$resource = new CResource;
+$resource_types =& $resource->typeSelect();
+$resources=$resource->loadAll();
+$resource_list=array('All');
+foreach ($resources as $row){
+	$resource_list[]=$AppUI->_($resource_types[$row['resource_type']]) . ': ' . $row['resource_name'];
+}
+$checked_resource= $AppUI->checkPrefState('CalIdxResourceFilter', @$_REQUEST['resource_filter'], 'RESFILTER', 0);
+
 // setup the title block
 $titleBlock = new w2p_Theme_TitleBlock('Monthly Calendar', 'myevo-appointments.png', $m, $m . '.' . $a);
+$titleBlock->addCell('<form action="'.$_SERVER['REQUEST_URI'].'" method="post" name="pickFilterResource" accept-charset="utf-8">' . arraySelect($resource_list, 'resource_filter', 'onchange="document.pickFilterResource.submit()" class="text"', $checked_resource, true) . '</form>');
+$titleBlock->addCell( $AppUI->_('Resource Filter') . ':');
 $titleBlock->addCrumb('?m=calendar&a=year_view&date=' . $date, 'year view');
 $titleBlock->addCrumb('?m=calendar&date=' . $date, 'month view');
 $titleBlock->addCrumb('?m=calendar&a=week_view&date=' . $date, 'week view');
@@ -102,8 +114,10 @@ if($last_time->getDayOfWeek() != 6) {
 
 $links = array();
 
-// assemble the links for the tasks
-getTaskLinks($first_time, $last_time, $links, 20, $company_id);
+if (!$checked_resource){
+	// assemble the links for the tasks
+	getTaskLinks($first_time, $last_time, $links, 20, $company_id);
+}
 
 // assemble the links for the events
 getEventLinks($first_time, $last_time, $links, 20);

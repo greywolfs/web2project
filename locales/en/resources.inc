@@ -17,6 +17,7 @@
 'Notes',
 'OVERALLOCATED',
 'Other resources',
+'Resource Filter',
 'Resource ID',
 'resource list','Description',
 'Resource Name',

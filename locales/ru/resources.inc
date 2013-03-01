@@ -16,6 +16,7 @@
 'OVERALLOCATED'=>'ПРЕВЫШЕНИЕ',
 'Other resources'=>'Ресурсы',
 'Resource'=>'Ресурс',
+'Resource Filter'=>'Фильтр по ресурсам',
 'Resource ID'=>'Идентификатор ресурса',
 'Resource Name'=>'Имя ресурса',
 'Resource Type'=>'Тип ресурса',
