@@ -153,7 +153,7 @@ table.list tr:hover td._name {
 
 .list ._complete, .list ._created, .list ._date, .list ._datetime, .list ._duration,
     .list ._hours, .list ._update, .list ._updated, .list ._worked, .list ._identifier,
-    .list ._size {
+    .list ._size, .list ._allocation {
     text-align: center;
 }
 .list th, .list ._author, .list ._creator, .list ._name, .list ._owner, .list ._updator,
@@ -206,12 +206,23 @@ div.clear {
     border-radius: 0px;
 }
 
+.view td.workingDay, .view td.otherDay {
+    border: #eeeeee solid thin;
+    height: 300px;
+    vertical-align: top;
+    width:14.29%;
+}
+
+.view td.otherDay {
+    background: silver;
+}
+
 .addedit textarea.customfield {
     height: 75px;
     width:  100%;
 }
 
-.view ._date, .view ._owner, .view ._status {
+.view ._date, .view ._owner, .view ._status, .view ._assignment {
     text-align: left;
 }
 
@@ -275,4 +286,30 @@ tr.active td._date, tr.active td._datetime, tr.active td._duration, tr.active td
 }
 .info p, .info li {
     font-size: medium;
+}
+
+/**
+ * The styles below are used by the projectdesigner module
+ */
+table.prjprint {
+    background: #ffffff;
+}
+
+table.prjprint TH {
+    background-color: #ffffff;
+    color: black;
+    list-style-type: disc;
+    list-style-position: inside;
+    border:solid 1px;
+    font-weight: normal;
+    font-size:15px;
+}
+
+table.prjprint TD {
+    background-color: #ffffff;
+    font-size:14px;
+}
+
+table.prjprint TR {
+    padding:5px;
 }

@@ -83,7 +83,7 @@ if ($caller == 'todo') {
     }
 
     $q->addGroup('t.task_id');
-    $q->addOrder('t.task_end_date, t.task_priority DESC');
+    $q->addOrder('t.task_start_date, t.task_end_date, t.task_priority');
 } else {
     // pull tasks
     $q = new w2p_Database_Query;
@@ -93,7 +93,6 @@ if ($caller == 'todo') {
         ' task_hours_worked, task_order, task_project, task_milestone, task_access,'.
         ' task_owner, project_name, project_color_identifier, task_dynamic');
     $q->addJoin('projects', 'p', 'project_id = t.task_project', 'inner');
-    $q->addOrder('p.project_id, t.task_end_date');
 
     // don't add milestones if box is checked//////////////////////////////////////////////////////////
     if ($showNoMilestones) {
@@ -133,6 +132,7 @@ if ($caller == 'todo') {
             $q->addWhere('ut.user_id = ' . (int)$AppUI->user_id);
             break;
     }
+    $q->addOrder('t.task_start_date, t.task_end_date, t.task_priority');
 }
 
 // get any specifically denied tasks
@@ -144,7 +144,7 @@ $q->clear();
 $orrarr[] = array('task_id' => 0, 'order_up' => 0, 'order' => '');
 
 $end_max = '0000-00-00 00:00:00';
-$start_min = date('Y-m-d H:i:s');
+$start_min = $AppUI->convertToSystemTZ(date('Y-m-d H:i:s'));
 
 //pull the tasks into an array
 if ($caller != 'todo') {

@@ -337,7 +337,7 @@ table.motitle td {
 }
 table.motitle th {
     background-color: #f0f0f0;
-    font-size: 10pt;
+    font-size: 12pt;
 }
 
 table.mocal {
@@ -481,7 +481,7 @@ a.button {
     border:0px;
 }
 
-a.button span {
+a.button span, a.button div {
     background: transparent url('images/button_left.gif') no-repeat;
     display: block;
     line-height: 14px;
@@ -516,7 +516,7 @@ a.delete {
 	border:0px;
 }
 
-a.delete span {
+a.delete span, a.delete div {
     background: transparent url('images/delete_left.gif') no-repeat;
     display: block;
     line-height: 14px;
@@ -554,7 +554,7 @@ a.delete:active span {
 	padding-right: 10px; /* sliding doors padding */
 	border:0px;
 }
-.crumb ul li span {
+.crumb ul li span, .crumb ul li div {
     background: transparent url('images/crumb_left.gif') no-repeat;
     display: block;
     line-height: 14px;

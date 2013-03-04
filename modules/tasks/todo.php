@@ -21,6 +21,26 @@ $user_id = $AppUI->user_id;
 $no_modify = false;
 $other_users = false;
 
+// retrieve any state parameters
+if (isset($_POST['show_form'])) {
+	$AppUI->setState('TaskDayShowArc', w2PgetParam($_POST, 'show_arc_proj', 0));
+	$AppUI->setState('TaskDayShowLow', w2PgetParam($_POST, 'show_low_task', 0));
+	$AppUI->setState('TaskDayShowHold', w2PgetParam($_POST, 'show_hold_proj', 0));
+	$AppUI->setState('TaskDayShowDyn', w2PgetParam($_POST, 'show_dyn_task', 0));
+	$AppUI->setState('TaskDayShowPin', w2PgetParam($_POST, 'show_pinned', 0));
+	$AppUI->setState('TaskDayShowEmptyDate', w2PgetParam($_POST, 'show_empty_date', 0));
+	$AppUI->setState('TaskDayShowInProgress', w2PgetParam($_POST, 'show_inprogress', 0));
+}
+
+// Required for today view.
+$showArcProjs = $AppUI->getState('TaskDayShowArc', 0);
+$showLowTasks = $AppUI->getState('TaskDayShowLow', 1);
+$showHoldProjs = $AppUI->getState('TaskDayShowHold', 0);
+$showDynTasks = $AppUI->getState('TaskDayShowDyn', 0);
+$showPinned = $AppUI->getState('TaskDayShowPin', 0);
+$showEmptyDate = $AppUI->getState('TaskDayShowEmptyDate', 0);
+$showInProgress = $AppUI->getState('TaskDayShowInProgress', 0);
+
 if (canView('admin')) { // let's see if the user has sysadmin access
 	$other_users = true;
 	if (($show_uid = w2PgetParam($_REQUEST, 'show_user_todo', 0)) != 0) { // lets see if the user wants to see anothers user mytodo
@@ -86,7 +106,7 @@ $allowedTasks = $tobj->getAllowedSQL($AppUI->user_id, 'ta.task_id');
 // query my sub-tasks (ignoring task parents)
 
 $q = new w2p_Database_Query;
-$q->addQuery('ta.*');
+$q->addQuery('distinct(ta.task_id), ta.*');
 $q->addQuery('project_name, pr.project_id, project_color_identifier');
 $q->addQuery('tp.task_pinned');
 $q->addQuery('ut.user_task_priority');
@@ -144,9 +164,7 @@ if (count($allowedProjects)) {
 	$q->addWhere($allowedProjects);
 }
 
-$q->addGroup('ta.task_id');
-$q->addOrder('ta.task_end_date');
-$q->addOrder('task_priority DESC');
+$q->addOrder('task_end_date, task_start_date, task_priority');
 $tasks = $q->loadList();
 
 /* we have to calculate the end_date via start_date+duration for
