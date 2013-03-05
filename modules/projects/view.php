@@ -80,6 +80,17 @@ $titleBlock->show();
 $htmlHelper = new w2p_Output_HTMLHelper($AppUI);
 ?>
 <script language="javascript" type="text/javascript">
+	function doDetails() {
+		obj=document.getElementById('contentTr');
+		col=document.getElementById('displayImg');
+		if (obj.style.display=="none") {
+			obj.style.display="block";
+			col.src="<?php echo w2PfindImage('icons/collapse.gif'); ?>";
+		} else {
+			obj.style.display="none";
+			col.src="<?php echo w2PfindImage('icons/expand.gif'); ?>";
+		}
+	}
 function expand_multiproject(id, table_name) {
       var trs = document.getElementsByTagName('tr');
 
@@ -119,11 +130,14 @@ function delIt() {
 <tr>
 	<td style="border: outset #d1d1cd 1px;background-color:#<?php echo $project->project_color_identifier; ?>" colspan="2" id="view-header">
 	<?php
-        echo '<font color="' . bestColor($project->project_color_identifier) . '"><strong>' . $project->project_name . '<strong></font>';
-    ?>
+        echo '	<a href="javascript:doDetails()">
+					<img border="0" align="middle" id="displayImg" alt="" src="' . w2PfindImage('icons/expand.gif') . '" />
+				</a>
+				<font color="' . bestColor($project->project_color_identifier) . '"><strong>' . $project->project_name . '<strong></font>
+			';?>
 	</td>
 </tr>
-<tr>
+<tr id='contentTr' style="display: none;">
 	<td width="50%" valign="top" class="view-column">
 		<strong><?php echo $AppUI->_('Details'); ?></strong>
 		<table cellspacing="1" cellpadding="2" border="0" width="100%">
