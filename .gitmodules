@@ -1,0 +1,3 @@
+[submodule "modules/risks"]
+	path = modules/risks
+	url = git@github.com:caseysoftware/web2project-risks.git
