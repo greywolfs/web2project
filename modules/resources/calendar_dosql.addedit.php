@@ -49,8 +49,8 @@ function checkClashOtherResource($resourceList = null) {
 	$q->addJoin('resources', 'ue', 'ue.resource_id = e1.resource_id');
 	$q->addJoin('sysvals', 'type', 'ue.resource_type=type.sysval_value_id');
 	$q->addWhere("sysval_title = 'ResourceTypes'");
-	$q->addWhere("event_start_date <= '" . $end_date->format(FMT_DATETIME_MYSQL) . "'");
-	$q->addWhere("event_end_date >= '" . $start_date->format(FMT_DATETIME_MYSQL) . "'");
+	$q->addWhere("event_start_date < '" . $end_date->format(FMT_DATETIME_MYSQL) . "'");
+	$q->addWhere("event_end_date > '" . $start_date->format(FMT_DATETIME_MYSQL) . "'");
 	$q->addWhere("ue.resource_id IN (" . implode(',', $resources) . ")");
 	if (!empty($obj->event_id))
 		$q->addWhere('e.event_id != ' . $obj->event_id);
