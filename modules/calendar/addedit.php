@@ -83,7 +83,8 @@ if (!$event_id && !$is_clash) {
 			$min = 0;
 			$h++;
 		}
-	}elseif(!empty($time)){
+	}
+	if(!empty($time)){
 		$h=(int)substr($time,0,2);
 		$min=intval((int)substr($time,2,2)/$inc);
 		$min *= $inc;
