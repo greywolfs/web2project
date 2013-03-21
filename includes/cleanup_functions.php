@@ -4110,7 +4110,7 @@ function getEventLinks($startPeriod, $endPeriod, &$links, $notUsed = null, $mini
 					$url = '?m=calendar&a=view&event_id=' . $row['event_id'];
 					$link['href'] = '';
 					$link['alt'] = '';
-					$link['text'] = w2PtoolTip($row['event_name'], getEventTooltip($row['event_id']), true) . w2PshowImage('event' . $row['event_type'] . '.png', 16, 16, '', '', 'calendar') . '</a>&nbsp;' . '<a href="' . $url . '"><span class="event">' . $row['event_name'] . '</span></a>' . w2PendTip();
+					$link['text'] = w2PtoolTip($row['event_name'], getEventTooltip($row['event_id']), true) . w2PshowImage('event' . $row['event_type'] . '.png', 16, 16, '', '', 'calendar') . '</a>&nbsp;' . '<a href="' . $url . '"><span class="event">'. $start->format('%R'). ' - ' . $row['event_name'] . '</span></a>' . w2PendTip();
 				}
 				$links[$date->format(FMT_TIMESTAMP_DATE)][] = $link;
 			}
