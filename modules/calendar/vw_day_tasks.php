@@ -14,6 +14,7 @@ $s = '';
 $dayStamp = $this_day->format(FMT_TIMESTAMP_DATE);
 
 if (isset($links[$dayStamp])) {
+	echo "<table>";
 	foreach ($links[$dayStamp] as $e) {
 		$href = isset($e['href']) ? $e['href'] : null;
 		$alt = isset($e['alt']) ? $e['alt'] : null;
