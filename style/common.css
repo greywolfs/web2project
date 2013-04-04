@@ -214,7 +214,7 @@ div.clear {
 }
 
 .view td.otherDay {
-    background: silver;
+    /*background: silver;*/
 }
 
 .addedit textarea.customfield {
