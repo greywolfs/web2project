@@ -1,3 +1,6 @@
 [submodule "modules/risks"]
 	path = modules/risks
 	url = git@github.com:caseysoftware/web2project-risks.git
+[submodule "modules/resourceManager"]
+	path = modules/resourceManager
+	url = git@github.com:greywolfs/web2project-resourceManager.git
