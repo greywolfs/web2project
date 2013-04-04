@@ -46,11 +46,12 @@ if (count($fields) > 0) {
     // TODO: This is only in place to provide an pre-upgrade-safe
     //   state for versions earlier than v3.0
     //   At some point at/after v4.0, this should be deprecated
-    $fieldList = array('link_name', 'link_description', 'link_category', 'link_task', 'contact_name', 'link_date');
+    $fieldList = array('link_name', 'link_description', 'link_category', 'link_task', 'link_owner', 'link_date');
     $fieldNames = array('Link Name', 'Description', 'Category', 'Task Name', 'Owner', 'Date');
 
     $module->storeSettings('links', 'index_list', $fieldList, $fieldNames);
 }
+$columnCount = 2 + count($fieldList);
 ?>
 <table class="tbl list">
     <tr>
@@ -79,13 +80,12 @@ for ($i = ($page - 1) * $xpg_pagesize; $i < $page * $xpg_pagesize && $i < $xpg_t
 		}
 		if ($showProject) {
 			$s = '<tr>';
-			$s .= '<td colspan="10" style="background-color:#' . $row['project_color_identifier'] . '" style="border: outset 2px #eeeeee">';
-			$s .= '<font color="' . bestColor($row['project_color_identifier']) . '">';
-			if ($row['link_project'] > 0)
-				$s .= '<a href="?m=projects&a=view&project_id=' . $row['link_project'] . '">' . $row['project_name'] . '</a>';
-			else
+			$s .= '<td colspan="' . $columnCount . '" style=" border: outset #d1d1cd 1px; background-color:#' . $row['project_color_identifier'] . ';">';
+			if ($row['link_project'] > 0) {
+				$s .= '<a href="?m=projects&a=view&project_id=' . $row['link_project'] . '" style="color:'.bestColor($row['project_color_identifier']) . '; font-weight: bold; padding-top: 2px;">' . $row['project_name'] . '</a>';
+            } else {
 				$s .= $row['project_name'];
-			$s .= '</font>';
+            }
 			$s .= '</td></tr>';
 			echo $s;
 		}
@@ -93,11 +93,11 @@ for ($i = ($page - 1) * $xpg_pagesize; $i < $page * $xpg_pagesize && $i < $xpg_t
 	$fp = $row['link_project'];
     ?>
     <tr>
-        <td nowrap="nowrap" width="20">
+        <td class="data _edit">
         <?php if ($canEdit) {
             echo '<a href="./index.php?m=' . $m . '&a=addedit&link_id=' . $row['link_id'] . '">' . w2PshowImage('icons/stock_edit-16.png', '16', '16') . '</a>';
         }
-        echo '</td><td width="20">';
+        echo '</td><td class="data">';
         echo '<a href="' . $row['link_url'] . '" target="_blank">' . w2PshowImage('forward.png', '16', '16') . '</a>';
         ?>
         </td>
@@ -112,7 +112,7 @@ for ($i = ($page - 1) * $xpg_pagesize; $i < $page * $xpg_pagesize && $i < $xpg_t
 
     if ($canEdit && 'links' != $m) { ?>
 	<tr>
-		<td colspan="<?php echo 2 + count($fieldList); ?>" align="right" valign="top" style="background-color:#ffffff">
+		<td colspan="<?php echo $columnCount; ?>" align="right" valign="top" style="background-color:#ffffff">
 			<input type="button" class=button value="<?php echo $AppUI->_('new link') ?>" onClick="javascript:window.location='./index.php?m=links&a=addedit&project_id=<?php echo $project_id; ?>&task_id=<?php echo $task_id; ?>'">
 		</td>
 	</tr>

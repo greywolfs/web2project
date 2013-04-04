@@ -102,7 +102,7 @@ $titleBlock->show();
 </tr>
 </table>
 
-<table border="0" cellspacing="1" cellpadding="2" width="100%" style="margin-width:4px;background-color:white" class="view">
+<table border="0" cellspacing="1" cellpadding="2" width="100%" class="view week">
 <?php
 
 $workingDays = explode(',', w2PgetConfig('cal_working_days'));
@@ -119,7 +119,7 @@ for ($i = 0; $i < 7; $i++) {
 	$dayStamp = $show_day->format(FMT_TIMESTAMP_DATE);
 	$href = '?m=calendar&a=day_view&date='.$dayStamp.'&tab=0';
 
-	$s .= '		<table style="width:100%;border-spacing:0;">';
+	$s .= '		<table>';
 	$s .= '		<tr><td align="left"><a href="' . $href . '">';
 
 	$s .= $dayStamp == $today ? '<span style="color:red">' : '';
@@ -133,13 +133,14 @@ for ($i = 0; $i < 7; $i++) {
 
 	if (isset($links[$dayStamp])) {
 		foreach ($links[$dayStamp] as $e) {
-			$href = isset($e['href']) ? $e['href'] : null;
-			$alt = isset($e['alt']) ? $e['alt'] : null;
+            $href = isset($e['href']) ? $e['href'] : null;
+            $alt = isset($e['alt']) ? $e['alt'] : null;
 
-			$s .= '<br />';
-			$s .= $href ? '<a href="'.$href.'" class="event" title="'.$alt.'">' : '';
-			$s .= $e['text'];
-			$s .= $href ? '</a>' : '';
+            $link  = $href ? '<a href="'.$href.'" title="'.$alt.'">' : '';
+            $link .= $e['text'];
+            $link .= $href ? '</a>' : '';
+
+            $s .= '<br /><span class="cal-item">' . $link . '</span>';
 		}
 	}
 

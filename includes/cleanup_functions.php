@@ -378,9 +378,10 @@ function cal_work_day_conv($val) {
 // from modules/tasks/tasks.class.php
 //This kludgy function echos children tasks as threads
 function showtask(&$arr, $level = 0, $notUsed = true, $today_view = false) {
-	global $AppUI, $durnTypes, $userAlloc, $showEditCheckbox;
+	global $AppUI, $userAlloc, $showEditCheckbox;
 	global $m, $a, $history_active, $expanded;
 
+    $durnTypes = w2PgetSysVal('TaskDurationType');
     //Check for Tasks Access
     $tmpTask = new CTask();
     $tmpTask->load($arr['task_id']);
@@ -404,23 +405,23 @@ function showtask(&$arr, $level = 0, $notUsed = true, $today_view = false) {
 		$s = '<tr id="' . $jsTaskId . '" class="'.$class.'" ' . (($level > 0 && !($m == 'tasks' && $a == 'view')) ? 'style="display:none"' : '') . '>';
 	}
 	// edit icon
-	$s .= '<td align="center">';
+	$s .= '<td class="data _edit">';
 	$canEdit = ($arr['task_represents_project']) ? false : true;
 	$canViewLog = true;
 	if ($canEdit) {
-        $s .= '<a href="?m=tasks&a=addedit&task_id=' . $arr['task_id'] . '">' . w2PtoolTip('edit task', 'click to edit this task') . w2PshowImage('icons/pencil.gif', 12, 12) . w2PendTip() . '</a>' ;
+        $s .= '<a href="?m=tasks&a=addedit&task_id=' . $arr['task_id'] . '">' . w2PshowImage('icons/pencil.gif', 12, 12) . '</a>' ;
 	}
 	$s .= '</td>';
 	// pinned
 	$pin_prefix = $arr['task_pinned'] ? '' : 'un';
-	$s .= ('<td><a href="?m=tasks&amp;pin=' . ($arr['task_pinned'] ? 0 : 1) . '&amp;task_id=' . $arr['task_id'] . '">' . w2PtoolTip('Pin', 'pin/unpin task') . '<img src="' . w2PfindImage('icons/' . $pin_prefix . 'pin.gif') . '" border="0" alt="" />' . w2PendTip() . '</a></td>');
+	$s .= ('<td class="data _pin"><a href="?m=tasks&amp;pin=' . ($arr['task_pinned'] ? 0 : 1) . '&amp;task_id=' . $arr['task_id'] . '">' . '<img src="' . w2PfindImage('icons/' . $pin_prefix . 'pin.gif') . '" border="0" alt="" />' . '</a></td>');
 	// New Log
 	if (isset($arr['task_log_problem']) && $arr['task_log_problem'] > 0) {
-		$s .= ('<td valign="middle"><a href="?m=tasks&amp;a=view&amp;task_id=' . $arr['task_id'] . '&amp;tab=0&amp;problem=1">' . w2PshowImage('icons/dialog-warning5.png', 16, 16, 'Problem', 'Problem!') . '</a></td>');
+		$s .= ('<td class="data"><a href="?m=tasks&amp;a=view&amp;task_id=' . $arr['task_id'] . '&amp;tab=0&amp;problem=1">' . w2PshowImage('icons/dialog-warning5.png', 16, 16, 'Problem', 'Problem!') . '</a></td>');
 	} elseif ($canViewLog && $arr['task_dynamic'] != 1 && 0 == $arr['task_represents_project']) {
-		$s .= ('<td align="center"><a href="?m=tasks&amp;a=view&amp;task_id=' . $arr['task_id'] . '&amp;tab=1">' . w2PtoolTip('Add Log', 'create a new log record against this task') . w2PshowImage('edit_add.png') . w2PendTip() . '</a></td>');
+		$s .= ('<td class="data"><a href="?m=tasks&amp;a=view&amp;task_id=' . $arr['task_id'] . '&amp;tab=1">' . w2PshowImage('edit_add.png') . '</a></td>');
 	} else {
-		$s .= '<td align="center">' . $AppUI->_('-') . '</td>';
+		$s .= '<td class="center">' . $AppUI->_('-') . '</td>';
 	}
 	// percent complete and priority
     $s .= $htmlHelper->createCell('task_percent_complete', $arr['task_percent_complete']);
@@ -478,13 +479,13 @@ function showtask(&$arr, $level = 0, $notUsed = true, $today_view = false) {
         $assigned_users = $arr['task_assigned_users'];
         $a_u_tmp_array = array();
 		if ($show_all_assignees) {
-			$s .= '<td align="center" nowrap="nowrap">';
+			$s .= '<td class="data">';
 			foreach ($assigned_users as $val) {
 				$a_u_tmp_array[] = ('<a href="?m=admin&amp;a=viewuser&amp;user_id=' . $val['user_id'] . '"' . 'title="' . (w2PgetConfig('check_overallocation') ? $AppUI->_('Extent of Assignment') . ':' . $userAlloc[$val['user_id']]['charge'] . '%; ' . $AppUI->_('Free Capacity') . ':' . $userAlloc[$val['user_id']]['freeCapacity'] . '%' : '') . '">' . $val['assignee'] . ' (' . $val['perc_assignment'] . '%)</a>');
 			}
 			$s .= join(', <br />', $a_u_tmp_array) . '</td>';
 		} else {
-			$s .= ('<td align="center" nowrap="nowrap">' . '<a href="?m=admin&amp;a=viewuser&amp;user_id=' . $assigned_users[0]['user_id'] . '" title="' . (w2PgetConfig('check_overallocation') ? $AppUI->_('Extent of Assignment') . ':' . $userAlloc[$assigned_users[0]['user_id']]['charge'] . '%; ' . $AppUI->_('Free Capacity') . ':' . $userAlloc[$assigned_users[0]['user_id']]['freeCapacity'] . '%' : '') . '">' . $assigned_users[0]['assignee'] . ' (' . $assigned_users[0]['perc_assignment'] . '%)</a>');
+			$s .= ('<td class="data">' . '<a href="?m=admin&amp;a=viewuser&amp;user_id=' . $assigned_users[0]['user_id'] . '" title="' . (w2PgetConfig('check_overallocation') ? $AppUI->_('Extent of Assignment') . ':' . $userAlloc[$assigned_users[0]['user_id']]['charge'] . '%; ' . $AppUI->_('Free Capacity') . ':' . $userAlloc[$assigned_users[0]['user_id']]['freeCapacity'] . '%' : '') . '">' . $assigned_users[0]['assignee'] . ' (' . $assigned_users[0]['perc_assignment'] . '%)</a>');
 			if ($arr['assignee_count'] > 1) {
 				$s .= (' <a href="javascript: void(0);" onclick="toggle_users(' . "'users_" . $arr['task_id'] . "'" . ');" title="' . join(', ', $a_u_tmp_array) . '">(+' . ($arr['assignee_count'] - 1) . ')</a>' . '<span style="display: none" id="users_' . $arr['task_id'] . '">');
 				$a_u_tmp_array[] = $assigned_users[0]['assignee'];
@@ -498,8 +499,9 @@ function showtask(&$arr, $level = 0, $notUsed = true, $today_view = false) {
 		}
 	} elseif (!$today_view) {
 		// No users asigned to task
-		$s .= '<td align="center">-</td>';
+		$s .= '<td class="data">-</td>';
 	}
+
 	// duration or milestone
     $s .= $htmlHelper->createCell('task_start_datetime', $arr['task_start_date']);
     $s .= $htmlHelper->createCell('task_duration', $arr['task_duration'] . ' ' . mb_substr($AppUI->_($durnTypes[$arr['task_duration_type']]), 0, 1));
@@ -512,7 +514,7 @@ function showtask(&$arr, $level = 0, $notUsed = true, $today_view = false) {
 
 	// Assignment checkbox
 	if ($showEditCheckbox) {
-		$s .= ('<td align="center">' . '<input type="checkbox" name="selected_task[' . $arr['task_id'] . ']" value="' . $arr['task_id'] . '"/></td>');
+		$s .= ('<td class="data">' . '<input type="checkbox" name="selected_task[' . $arr['task_id'] . ']" value="' . $arr['task_id'] . '"/></td>');
 	}
 	$s .= '</tr>'."\n";
 	return $s;
@@ -521,9 +523,10 @@ function showtask(&$arr, $level = 0, $notUsed = true, $today_view = false) {
 //This kludgy function echos children tasks as threads on project designer (_pd)
 //TODO: modules/projectdesigner/projectdesigner.class.php
 function showtask_pd(&$arr, $level = 0, $today_view = false) {
-	global $AppUI, $w2Pconfig, $done, $durnTypes, $userAlloc, $showEditCheckbox;
+	global $AppUI, $w2Pconfig, $done, $userAlloc, $showEditCheckbox;
 	global $task_access, $PROJDESIGN_CONFIG, $m, $expanded;
 
+    $durnTypes = w2PgetSysVal('TaskDurationType');
     //Check for Tasks Access
     $tmpTask = new CTask();
     $tmpTask->load($arr['task_id']);
@@ -551,10 +554,10 @@ function showtask_pd(&$arr, $level = 0, $today_view = false) {
 	} else {
 		$s = '<tr id="' . $jsTaskId . '" class="'.$class.'" onclick="select_row(\'selected_task\', \'' . $arr['task_id'] . '\', \'frm_tasks\')" ' . ($level ? 'style="display:none"' : '') . '>'; // edit icon
 	}
-	$s .= '<td>';
+	$s .= '<td class="data _edit">';
 	$canEdit = ($arr['task_represents_project']) ? false : true;
 	if ($canEdit) {
-		$s .= '<a href="?m=tasks&a=addedit&task_id=' . $arr['task_id'] . '">' . w2PtoolTip('edit tasks panel', 'click to edit this task') . w2PshowImage('icons/pencil.gif', 12, 12) . w2PendTip() . '</a>';
+		$s .= '<a href="?m=tasks&a=addedit&task_id=' . $arr['task_id'] . '">' . w2PshowImage('icons/pencil.gif', 12, 12) . '</a>';
 	}
 	$s .= '</td>';
 	// percent complete and priority
@@ -563,19 +566,19 @@ function showtask_pd(&$arr, $level = 0, $today_view = false) {
     $s .= $htmlHelper->createCell('user_task_priority', $arr['user_task_priority']);
 
 	// access
-	$s .= '<td nowrap="nowrap">';
+	$s .= '<td class="data">';
 	$s .= mb_substr($task_access[$arr['task_access']], 0, 3);
 	$s .= '</td>';
 	// type
-	$s .= '<td nowrap="nowrap">';
+	$s .= '<td class="data">';
 	$s .= mb_substr($types[$arr['task_type']], 0, 3);
 	$s .= '</td>';
 	// type
-	$s .= '<td nowrap="nowrap">';
+	$s .= '<td class="data">';
 	$s .= $arr['queue_id'] ? 'Yes' : '';
 	$s .= '</td>';
 	// inactive
-	$s .= '<td nowrap="nowrap">';
+	$s .= '<td class="data">';
 	$s .= $arr['task_status'] == '-1' ? 'Yes' : '';
 	$s .= '</td>';
 	// add log
@@ -667,12 +670,12 @@ function showtask_pd(&$arr, $level = 0, $today_view = false) {
 		}
 	} else {
 		// No users asigned to task
-		$s .= '<td align="center">-</td>';
+		$s .= '<td class="data">-</td>';
 	}
 
 	// Assignment checkbox
 	if ($showEditCheckbox && 0 == $arr['task_represents_project']) {
-		$s .= '<td align="center"><input type="checkbox" onclick="select_box(\'multi_check\', ' . $arr['task_id'] . ',\'project_' . $arr['task_project'] . '_level-' . $level . '-task_' . $arr['task_id'] . '_\',\'frm_tasks\')" onfocus="is_check=true;" onblur="is_check=false;" id="selected_task_' . $arr['task_id'] . '" name="selected_task" value="' . $arr['task_id'] . '"/></td>';
+		$s .= '<td class="data"><input type="checkbox" onclick="select_box(\'multi_check\', ' . $arr['task_id'] . ',\'project_' . $arr['task_project'] . '_level-' . $level . '-task_' . $arr['task_id'] . '_\',\'frm_tasks\')" onfocus="is_check=true;" onblur="is_check=false;" id="selected_task_' . $arr['task_id'] . '" name="selected_task" value="' . $arr['task_id'] . '"/></td>';
 	}
 	$s .= '</tr>';
 
@@ -2073,7 +2076,7 @@ function displayFiles($AppUI, $folder_id, $task_id, $project_id, $company_id) {
     foreach ($fieldNames as $index => $name) {
         $s .= '<th>' . $AppUI->_($fieldNames[$index]) . '</th>';
     }
-    $s .= '<th></th>';
+    $s .= '<th></th><th></th>';
 	$s .= '</tr>';
 
 	$fp = -1;
@@ -2110,12 +2113,12 @@ function displayFiles($AppUI, $folder_id, $task_id, $project_id, $company_id) {
         $htmlHelper->stageRowData($row);
 
         $s .= '<tr>';
- 		$s .= '<td nowrap="nowrap" width="20">';
+ 		$s .= '<td class="data">';
 		if ($canEdit && (empty($latest_file['file_checkout']) || ($latest_file['file_checkout'] == 'final' && ($canEdit || $latest_file['project_owner'] == $AppUI->user_id)))) {
 			$s .= '<a href="./index.php?m=files&a=addedit&file_id=' . $latest_file['file_id'] . '">' . w2PshowImage('kedit.png', '16', '16', 'edit file', 'edit file', 'files') . '</a>';
         }
         $s .= '</td>';
-		$s .= '<td nowrap="nowrap">';
+		$s .= '<td class="data">';
 		if ($canEdit && empty($latest_file['file_checkout'])) {
             $s .= '<a href="?m=files&a=co&file_id=' . $latest_file['file_id'] . '">' . w2PshowImage('up.png', '16', '16', 'checkout', 'checkout file', 'files') . '</a>';
 		} else {
@@ -2181,6 +2184,12 @@ function displayFiles($AppUI, $folder_id, $task_id, $project_id, $company_id) {
             </form>';
         $s .= '<a href="javascript: void(0);" onclick="if (confirm(\'' . $AppUI->_('Are you sure you want to delete this file?') . '\')) {document.frm_remove_file_' . $latest_file['file_id'] . '.submit()}">' . w2PshowImage('remove.png', '16', '16', 'delete file', 'delete file', 'files') . '</a>';
         $s .= '</td>';
+		$s .= '<td nowrap="nowrap" align="center" width="1">';
+		if ($canEdit && (empty($latest_file['file_checkout']) || ($latest_file['file_checkout'] == 'final' && ($canEdit || $latest_file['project_owner'] == $AppUI->user_id)))) {
+			$bulk_op = 'onchange="(this.checked) ? addBulkComponent(' . $latest_file['file_id'] . ') : removeBulkComponent(' . $latest_file['file_id'] . ')"';
+			$s .= '<input type="checkbox" ' . $bulk_op . ' name="chk_sel_file_' . $latest_file['file_id'] . '" />';
+		}
+		$s .= '</td>';
         $s .= '</tr>';
 		$s .= $hidden_table;
 		$hidden_table = '';

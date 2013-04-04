@@ -100,15 +100,13 @@ function delIt() {
                 <tr>
                     <td align="right" nowrap="nowrap"><?php echo $AppUI->_('Project'); ?>:</td>
                     <td style="background-color:#<?php echo $obj->project_color_identifier; ?>">
-                        <font color="<?php echo bestColor($obj->project_color_identifier); ?>">
-                            <?php
-                            $perms = &$AppUI->acl();
-                            if ($perms->checkModuleItem('projects', 'access', $obj->task_project)) { ?>
-                                <?php echo "<a href='?m=projects&a=view&project_id=" . $obj->task_project . "'>" . htmlspecialchars($obj->project_name, ENT_QUOTES) . '</a>'; ?>
-                            <?php } else { ?>
-                                <?php echo htmlspecialchars($company_detail['company_name'], ENT_QUOTES); ?>
-                            <?php } ?>
-                        </font>
+                        <?php
+                        $perms = &$AppUI->acl();
+                        if ($perms->checkModuleItem('projects', 'access', $obj->task_project)) { ?>
+                            <?php echo "<a href='?m=projects&a=view&project_id=" . $obj->task_project . "' style='color: " . bestColor($obj->project_color_identifier) ."'>" . htmlspecialchars($obj->project_name, ENT_QUOTES) . '</a>'; ?>
+                        <?php } else { ?>
+                            <?php echo htmlspecialchars($company_detail['company_name'], ENT_QUOTES); ?>
+                        <?php } ?>
                     </td>
                 </tr>
                 <tr>
@@ -157,7 +155,7 @@ function delIt() {
                 </tr>
                 <tr>
                     <td align="right" nowrap="nowrap"><?php echo $AppUI->_('Time Worked'); ?>:</td>
-                    <?php echo $htmlHelper->createCell('task_hours_worked', $obj->task_hours_worked . ' ' . $AppUI->_($durnTypes[$obj->task_duration_type])); ?>
+                    <?php echo $htmlHelper->createCell('task_hours_worked', $obj->task_hours_worked . ' ' . $AppUI->_('hours')); ?>
                 </tr>
                 <tr>
                     <td nowrap="nowrap" colspan="2"><strong><?php echo $AppUI->_('Dates and Targets'); ?></strong></td>
@@ -178,6 +176,7 @@ function delIt() {
                     <td align="right" nowrap="nowrap"><?php echo $AppUI->_('Task Type'); ?> :</td>
                     <?php echo $htmlHelper->createCell('task_type', $AppUI->_($task_types[$obj->task_type])); ?>
                 </tr>
+                <?php if (w2PgetConfig('budget_info_display', false)) { ?>
 				<tr>
                     <td align="center" nowrap="nowrap"><?php echo $AppUI->_('Finances'); ?>:</td>
                     <td align="center" nowrap="nowrap">
@@ -294,6 +293,7 @@ function delIt() {
                         </table>
                     </td>
                 </tr>
+                <?php } ?>
             </table>
         </td>
 

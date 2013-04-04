@@ -1,4 +1,81 @@
 
+body {
+    background-color: #f2f2f2;
+    color: #333;
+    font-family: Osaka,verdana,Sans-Serif;
+    font-size: 10pt;
+    margin-bottom: 10px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+}
+
+em {
+    font-weight: bold;
+    text-decoration: none;
+    font-style: normal;
+}
+
+a:link {
+	color: #333333;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #333333;
+	text-decoration: none;
+}
+
+a:active {
+	color: #333333;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #666666;
+	text-decoration: none;
+}
+
+tr {
+	font-size: 8pt
+}
+
+td {
+	font-size: 8pt
+}
+
+h1, .title {
+    color: #333;
+    font-family: Trebuchet MS,Arial,Osaka,verdana,Sans-Serif;
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 0px;
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+
+h2, .subtitle {
+    color: #333;
+    font-family: 'Trebuchet MS',arial,Osaka,verdana,Sans-Serif;
+    font-size: 12px;
+    font-weight: bold;
+	margin-bottom: 0px;
+	margin-top: 15px;
+    text-transform: uppercase;
+}
+
+h3 {
+    color: #333;
+    font-family: 'Trebuchet MS',arial,Osaka,verdana,Sans-Serif;
+    font-size: 12px;
+    font-weight: bold;
+	margin-bottom: 0px;
+	margin-top: 35px;
+}
+
+
+
+
 /* These are some default styles used throughout. */
 .left {
     float: left;
@@ -7,6 +84,10 @@
 
 .right {
     float:      right;
+}
+
+.center {
+    text-align: center;
 }
 
 .icon {
@@ -18,6 +99,10 @@ div {
     font-size:  8pt;
 }
 
+div.clear {
+    clear: both;
+}
+
 div.std {
 	background: #fafafa;
     height:     1%;
@@ -27,12 +112,6 @@ div.std {
 /* End: Structural styles
 
 /* Begin: Header Bar & Navigation for all pages */
-.nav ul li {
-	float:      left;
-	margin:     0px 1px 0px 0px;
-	padding:    0px;
-}
-
 .nav ul {
     font:       bold 8pt helvetica,arial,sans-serif;
 	line-height:100%;
@@ -40,6 +119,12 @@ div.std {
 	list-style-position:outside;
 	list-style-type:none;
 	margin:     2px 0px 0px 0px;
+	padding:    0px;
+}
+
+.nav ul li {
+	float:      left;
+	margin:     0px 1px 0px 0px;
 	padding:    0px;
 }
 
@@ -68,25 +153,25 @@ form {
     width: 100%;
 }
 
+.module-title h1 {
+    float: left;
+    margin-top: 15px;
+}
+
 .module-title .icon {
     float: left;
     margin: 3px;
 }
 
-.module-title h1 {
-    float: left;
-    margin-top: 15px;
+.module-title .crumb-right {
+    float: right;
+    margin: 10px 0;
 }
 
 .module-nav {
     float: left;
     margin: -15px 0 5px;
     width: 100%;
-}
-
-.module-title .crumb-right {
-    float: right;
-    margin: 10px 0;
 }
 
 .module-nav .crumb-right {
@@ -112,8 +197,24 @@ form {
 .error,.warning {
     color:red
 }
-.center {
+
+input[type="checkbox"] {
+    /**margin-left: 10px;*/
+}
+
+/*
+ * These are the styles attached to the list screens which are urls like:
+ *      ./index.php?m=projects
+ *      ./index.php?m=companies
+ */
+
+.data {
     text-align: center;
+    white-space:nowrap;
+}
+
+._departments {
+    text-align: left;
 }
 ._duration {
     text-align: right;
@@ -122,17 +223,23 @@ form {
 ._identifier {
     border: outset #eeeeee 1px;
 }
-input[type="checkbox"] {
-    margin-left: 10px;
+
+._description {
+    white-space: normal;
 }
 
-/*
- * These are the styles attached to the list screens which are urls like:
- *      ./index.php?m=projects
- *      ./index.php?m=companies
- */
- 
+.budgets, .budgets input {
+    text-align: right;
+}
+.budgets tr:first-child {
+    text-align: center;
+}
+.budgets input {
+    width: 40pt;
+}
+
 table.list {
+    background-color: white;
     border-spacing: 1px;
     padding: 2px;
     width: 100%;
@@ -147,20 +254,23 @@ table.list tr:hover td {
 table.list tr:hover td._name {
     font-weight: bold;
 }
- 
-.list ._name {          width: 25%; }
-.list ._description {   width: 30%; }
 
-.list ._complete, .list ._created, .list ._date, .list ._datetime, .list ._duration,
-    .list ._hours, .list ._update, .list ._updated, .list ._worked, .list ._identifier,
-    .list ._size, .list ._allocation {
-    text-align: center;
+.list ._description {
+    text-align: left;
+    white-space: normal;
 }
-.list th, .list ._author, .list ._creator, .list ._name, .list ._owner, .list ._updator,
-    .list ._size, .list ._birthday, .list ._date, .list ._created, .list ._datetime,
-    .list ._update, .list ._updated {
-        white-space:nowrap;
+
+.list ._identifier {
+    padding: 5px;
+    width: 40px;
 }
+
+.list ._name {
+    text-align: left;
+    width: 25%;
+}
+
+.list ._description {   width: 30%; }
 
 .list.history td.data._description {
     width: 60%;
@@ -171,10 +281,6 @@ table.list tr:hover td._name {
 }
 .list.history td.data._user {
     text-align: center;
-}
-
-div.clear {
-    clear: both;
 }
 
 /*
@@ -188,6 +294,7 @@ div.clear {
     text-align: left;
     width: 100%;
 }
+
 #view-header {
     margin-bottom: 5px;
     padding: 4px;
@@ -201,7 +308,9 @@ div.clear {
     -moz-border-radius:3px;
     -webkit-border-radius:3px;
     border-radius:3px;
+    text-align: left;
 }
+
 .view .list td.data {
     border-radius: 0px;
 }
@@ -220,16 +329,6 @@ div.clear {
 .addedit textarea.customfield {
     height: 75px;
     width:  100%;
-}
-
-.view ._date, .view ._owner, .view ._status, .view ._assignment {
-    text-align: left;
-}
-
-._assignment, ._category, ._count, .countp, ._complete, ._in, .inactive,
-    ._owner, ._priority, ._problem, ._problem, .replies, ._status, ._username,
-    ._users, ._version {
-    text-align: center;
 }
 
 /*
@@ -412,7 +511,68 @@ table.prjprint TR {
     width: 250px;
 }
 
-.login td, .login th {
+table.login tr th {
+    padding: 6px;
+    white-space:nowrap;
+}
+
+table.login td {
     padding: 0;
     white-space:nowrap;
+}
+
+table.minititle th {
+    font-weight: normal;
+}
+
+bordertable, .bordertable{
+    border: 1px black solid;
+}
+
+#progressBar {
+    font-size: 1px;
+    height: 15px;
+    width: 0px;
+}
+
+table.week {
+    background-color:white;
+}
+
+table.week table {
+    border-spacing: 0;
+    width: 100%;
+}
+
+span.cal-item * {
+    float: left;
+}
+
+span.cal-item a {
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.subprojects {
+    background-color: black;
+    border: 0px;
+    text-align: center;
+    white-space:nowrap;
+    width: 100%;
+}
+
+.subprojects tr:nth-child(even) {
+    background-color: #f0f0f0;
+}
+.subprojects tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+.subprojects td.data {
+    background-color: inherit;
+    text-align: inherit;
+}
+
+.subprojects td._name {
+    text-align: left;
 }
