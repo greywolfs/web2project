@@ -167,6 +167,7 @@
 'reports index',
 'required',
 'requiredField'=>'indicates required field',
+'Resource Management',
 'Resources',
 'Roles',
 'Sat',

@@ -57,6 +57,7 @@
 'Division'=>'Отдел',
 'Document Space Utilized'=>'Использовано дискового пространства',
 'Due Date'=>'Срок',
+'Dur'=>'Продолж.',
 'Duration'=>'Длительность',
 'Dynamically calculated'=>'Вычисляемое',
 'Edit Project'=>'Править проект',

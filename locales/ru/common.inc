@@ -138,6 +138,7 @@
 'Repeat New Password'=>'Посторите новый пароль',
 'Reports'=>'Отчеты',
 'Reports Available'=>'Доступные отчеты',
+'Resource Management'=>'Менеджер пользователей',
 'Resources'=>'Ресурсы',
 'Roles'=>'Роли',
 'Sat'=>'Сб.',

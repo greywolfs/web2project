@@ -58,6 +58,7 @@
 'Document Space Utilized',
 'Due Date',
 'Duration',
+'Dur',
 'Dynamically calculated',
 'Edit Project',
 'End',

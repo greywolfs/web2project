@@ -70,7 +70,7 @@
 'Do you want to accept this changes?',
 'Done',
 'Due In',
-'Dur.',
+'Dur',
 'Duration',
 'Dynamic Task',
 'Dynamic Tasks',

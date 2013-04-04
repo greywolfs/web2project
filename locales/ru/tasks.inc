@@ -72,7 +72,7 @@
 'Do you want to accept this changes?'=>'Принять изменения?',
 'Done'=>'завершено',
 'Due In'=>'Ост. дл.',
-'Dur.'=>'Дл.',
+'Dur'=>'Дл.',
 'Duration'=>'Длительность',
 'Dynamic Task'=>'Групповая задача',
 'Dynamic Tasks'=>'Групповые задачи',
