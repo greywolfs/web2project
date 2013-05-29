@@ -106,8 +106,7 @@ class CContact extends w2p_Core_BaseObject
         $fields = array();
         $values = array();
 
-        // TODO:  I *really* don't like using the POST inside here..
-        $contact_methods = empty($_POST['contact_methods']) ? array() : $_POST['contact_methods'];
+        $contact_methods = $this->_contact_methods;
         if (count($contact_methods)) {
             foreach ($contact_methods['field'] as $key => $notUsed) {
                 $fields[] = $contact_methods['field'][$key];
@@ -117,10 +116,6 @@ class CContact extends w2p_Core_BaseObject
         $methods['fields'] = $fields;
         $methods['values'] = $values;
         $this->setContactMethods($methods);
-
-        $custom_fields = new w2p_Core_CustomFields('contacts', 'addedit', $this->contact_id, 'edit');
-        $custom_fields->bind($_POST);
-        $custom_fields->store($this->contact_id); // Store Custom Fields
 
         parent::hook_postStore();
     }
@@ -354,12 +349,12 @@ class CContact extends w2p_Core_BaseObject
     public function notify()
     {
         $result = false;
-        global $locale_char_set;
+
         $df = $this->_AppUI->getPref('SHDATEFORMAT');
         $df .= ' ' . $this->_AppUI->getPref('TIMEFORMAT');
 
         $mail = new w2p_Utilities_Mail();
-        $mail->Subject('Hello', $locale_char_set);
+        $mail->Subject('Hello', $this->_locale_char_set);
 
         if ($this->contact_email) {
             $emailManager = new w2p_Output_EmailManager($this->_AppUI);

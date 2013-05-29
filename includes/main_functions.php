@@ -12,26 +12,18 @@ require_once W2P_BASE_DIR . '/includes/backcompat_functions.php';
 require_once W2P_BASE_DIR . '/includes/deprecated_functions.php';
 require_once W2P_BASE_DIR . '/includes/cleanup_functions.php';
 require_once W2P_BASE_DIR . '/lib/adodb/adodb.inc.php';
+require_once W2P_BASE_DIR . '/classes/w2p/web2project.php';
+
+spl_autoload_register('web2project_autoload');
+spl_autoload_register('w2p_old_autoload');
 
 /**
- * @todo Personally, I'm already hating this autoloader... while it's great in
- * concept, we don't have anything that resembles a real class naming convention
- * so this ends up being nasty and getting nastier.  Hopefully, we can clean
- * these things up for v3.x
+ * For all intents and purposes, this autoloader should be considered
+ *  deprecated. As we move forward, we'll continue to simplify and clean this
+ *  up so that it should eventually be nothing except the module autoloader.
  */
-spl_autoload_register('w2p_autoload');
-
-function w2p_autoload($class_name)
+function w2p_old_autoload($class_name)
 {
-    $name = $class_name;
-
-    if (false !== strpos($name, 'w2p_')) {
-        $name = str_replace('_', DIRECTORY_SEPARATOR, $name);
-        $classpath = W2P_BASE_DIR . '/classes/' . $name . '.class.php';
-        require_once $classpath;
-        return;
-    }
-
     $name = strtolower($class_name);
     switch ($name) {
         case 'bcode':                   // Deprecated as of v3.0, TODO: remove this in v4.0
@@ -60,7 +52,6 @@ function w2p_autoload($class_name)
             require_once W2P_BASE_DIR . '/classes/deprecated.class.php';
             break;
 
-
         /*
          * The following are all wirings for module classes that don't follow
          * our naming conventions.
@@ -78,8 +69,37 @@ function w2p_autoload($class_name)
         /*
          * These are our library helper libraries. They're included here to simplify usage.
          */
+        case 'captcha':
+            require_once W2P_BASE_DIR . '/lib/captcha/Captcha.class.php';
+            break;
+        case 'contact_vcard_build':
+            require_once W2P_BASE_DIR . '/lib/PEAR/Contact_Vcard_Build.php';
+            break;
+        case 'contact_vcard_parse':
+            require_once W2P_BASE_DIR . '/lib/PEAR/Contact_Vcard_Parse.php';
+            break;
         case 'date':
-            require_once W2P_BASE_DIR . '/lib/PEAR/Date.php';
+        case 'date_calc':
+        case 'date_human':
+        case 'date_span':
+        case 'date_timezone':
+        case 'html_bbcodeparser_filter':
+        case 'html_bbcodeparser_filter_basic':
+        case 'html_bbcodeparser_filter_email':
+        case 'html_bbcodeparser_filter_extended':
+        case 'html_bbcodeparser_filter_links':
+        case 'html_bbcodeparser_filter_lists':
+            $filename = str_replace('_', '/', $class_name) . '.php';
+            require_once W2P_BASE_DIR . '/lib/PEAR/' . $filename;
+            break;
+        case 'html_bbcodeparser':
+            require_once W2P_BASE_DIR . '/lib/PEAR/BBCodeParser.php';
+            break;
+        case 'cezpdf':
+            require_once W2P_BASE_DIR . '/lib/ezpdf/class.ezpdf.php';
+            break;
+        case 'cpdf':
+            require_once W2P_BASE_DIR . '/lib/ezpdf/class.pdf.php';
             break;
         case 'gacl':
             require_once W2P_BASE_DIR . '/lib/phpgacl/gacl.class.php';
@@ -102,13 +122,6 @@ function w2p_autoload($class_name)
             break;
 
         default:
-            if (file_exists(W2P_BASE_DIR . '/classes/' . $name . '.class.php')) {
-                // Deprecated as of v3.0, TODO: remove this in v4.0
-                trigger_error("The /classes/$name.class.php 'naming convention' has been deprecated in v3.0 and will be removed by v4.0.", E_USER_NOTICE);
-                require_once W2P_BASE_DIR . '/classes/' . $name . '.class.php';
-                return;
-            }
-
             if ($name[0] == 'c') {
                 $name = substr($name, 1);
             }

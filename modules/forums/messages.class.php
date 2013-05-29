@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package     web2project\modules\misc
  */
@@ -139,8 +138,6 @@ class CForum_Message extends w2p_Core_BaseObject
 
     public function sendWatchMail($debug = false)
     {
-        global $debug;
-
         // Get the message from details.
         $q = $this->_getQuery();
         $q->clear();

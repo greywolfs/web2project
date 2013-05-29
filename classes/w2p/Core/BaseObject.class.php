@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Parent class to all database table derived objects
  *
@@ -42,12 +41,14 @@ abstract class w2p_Core_BaseObject extends w2p_Core_Event implements w2p_Core_Li
      */
     protected $_AppUI;
     protected $_perms;
+    protected $_w2Pconfig;
 
     /**
      * @var string Internal name of the module as stored in the 'mod_directory' of the 'modules' table, and the 'value' field of the 'gacl_axo' table
      */
     protected $_tbl_module;
     protected $_dispatcher;
+    protected $_locale_char_set;
 
     /**
      * 	Object constructor to set table and key field
@@ -77,6 +78,10 @@ abstract class w2p_Core_BaseObject extends w2p_Core_Event implements w2p_Core_Li
         global $AppUI;
         $this->_AppUI = is_null($AppUI) ? new w2p_Core_CAppUI() : $AppUI;
         $this->_perms = $this->_AppUI->acl();
+        global $w2Pconfig;
+        $this->_w2Pconfig;
+        global $locale_char_set;
+        $this->_locale_char_set = $locale_char_set;
 
         /*
          * This block does a lot and may need to be simplified.. but the point
@@ -684,14 +689,17 @@ abstract class w2p_Core_BaseObject extends w2p_Core_Event implements w2p_Core_Li
      * This method is called within $this->store() but only after the object
      *   was stored properly. You might use this to send notifications or
      *   update other objects.
+     * @todo TODO: I REALLY hate this $_POST here.. it's just asking for trouble.
      *
      * @return \w2p_Core_BaseObject
      */
     protected function hook_postStore()
     {
-        //NOTE: This only happens if the create was successful.
-        $prefix = $this->_getColumnPrefixFromTableName($this->_tbl);
+        $custom_fields = new w2p_Core_CustomFields($this->_tbl_module, 'addedit', $this->{$this->_tbl_key}, 'edit');
+        $custom_fields->bind($_POST);
+        $custom_fields->store($this->{$this->_tbl_key});
 
+        $prefix = $this->_getColumnPrefixFromTableName($this->_tbl);
         $name = ('' != $this->{$prefix . '_name'}) ? $this->{$prefix . '_name'} : '';
         addHistory($this->_tbl, $this->{$this->_tbl_key}, $this->_event, $name . ' - ' .
                 $this->_AppUI->_('ACTION') . ': ' . $this->_event . ' ' . $this->_AppUI->_('TABLE') . ': ' .
@@ -765,7 +773,7 @@ abstract class w2p_Core_BaseObject extends w2p_Core_Event implements w2p_Core_Li
             default:
             //do nothing
         }
-        //error_log("{$event->resourceName} published {$event->eventName} to call hook_$hook");
+        //error_log("{$event->resourceName} published {$event->eventName} with id: " . $this->{$this->_tbl_key});
     }
 
     /**

@@ -1,16 +1,24 @@
 <?php
+if (!defined('W2P_BASE_DIR')) {
+	die('You should not access this file directly.');
+}
 
-##
-##  This overrides the show function of the CTabBox_core function
-##
+class style_w2psnowball extends w2p_Theme_Base
+{
+    public function __construct($AppUI, $m = '') {
+        $this->_uistyle = 'w2p-snowball';
+
+        parent::__construct($AppUI, $m);
+    }
+}
+
+/**
+ * This overrides the show function of the CTabBox_core function
+ */
 class CTabBox extends w2p_Theme_TabBox {
-	function show($extra = '', $js_tabs = false, $alignment = 'left', $opt_flat = true) {
-		global $AppUI, $w2Pconfig, $currentTabId, $currentTabName, $m, $a;
+	public function show($extra = '', $js_tabs = false, $alignment = 'left', $opt_flat = true) {
+		global $currentTabId, $currentTabName, $m, $a;
 		$this->loadExtras($m, $a);
-		$uistyle = $AppUI->getPref('UISTYLE') ? $AppUI->getPref('UISTYLE') : $w2Pconfig['host_style'];
-		if (!$uistyle) {
-			$uistyle = 'web2project';
-		}
 
 		if (($a == 'addedit' || $a == 'view' || $a == 'viewuser') && function_exists('styleRenderBoxBottom')) {
 			echo styleRenderBoxBottom();
@@ -19,15 +27,15 @@ class CTabBox extends w2p_Theme_TabBox {
 		reset($this->tabs);
 		$s = '';
 		// tabbed / flat view options
-		if ($AppUI->getPref('TABVIEW') == 0) {
+		if ($this->_AppUI->getPref('TABVIEW') == 0) {
 			if ($opt_flat) {
 				$s .= '<table border="0" cellpadding="2" cellspacing="0" width="100%">';
 				$s .= '<tr>';
 				$s .= '<td width="54" nowrap="nowrap">';
-				$s .= '<a class="button" href="' . $this->baseHRef . 'tab=0"><span>' . $AppUI->_('tabbed') . '</span></a>';
+				$s .= '<a class="button" href="' . $this->baseHRef . 'tab=0"><span>' . $this->_AppUI->_('tabbed') . '</span></a>';
 				$s .= '</td>';
 				$s .= '<td nowrap="nowrap">';
-				$s .= '<a class="button" href="' . $this->baseHRef . 'tab=-1"><span>' . $AppUI->_('flat') . '</span></a>';
+				$s .= '<a class="button" href="' . $this->baseHRef . 'tab=-1"><span>' . $this->_AppUI->_('flat') . '</span></a>';
 				$s .= '</td>' . $extra . '</tr></table>';
 				echo $s;
 			}
@@ -37,11 +45,12 @@ class CTabBox extends w2p_Theme_TabBox {
 			}
 		}
 
-		if ($this->active < 0 || $AppUI->getPref('TABVIEW') == 2) {
+		if ($this->active < 0 || $this->_AppUI->getPref('TABVIEW') == 2) {
 			// flat view, active = -1
 			echo '<table border="0" cellpadding="2" cellspacing="0" width="100%">';
 			foreach ($this->tabs as $k => $v) {
-				echo '<tr><td><strong>' . ($v[2] ? $v[1] : $AppUI->_($v[1])) . '</strong></td></tr><tr><td>';
+				echo '<tr><td><strong>' . ($v[2] ? $v[1] : $this->_AppUI->_($v[1])) . '</strong></td></tr>';
+                echo '<tr><td>';
 				$currentTabId = $k;
 				$currentTabName = $v[1];
 				include $this->baseInc . $v[0] . '.php';
@@ -60,7 +69,7 @@ class CTabBox extends w2p_Theme_TabBox {
 			foreach ($this->tabs as $k => $v) {
 				$class = ($k == $this->active) ? 'tabon' : 'taboff';
 				$sel = ($k == $this->active) ? 'Selected' : '';
-				$s .= '<td valign="middle"><img src="./style/' . $uistyle . '/images/bar_top_' . $sel . 'left.gif" id="lefttab_' . $k . '" border="0" alt="" /></td>';
+				$s .= '<td valign="middle"><img src="./style/' . $this->_uistyle . '/images/bar_top_' . $sel . 'left.gif" id="lefttab_' . $k . '" border="0" alt="" /></td>';
 				$s .= '<td id="toptab_' . $k . '" valign="middle" nowrap="nowrap" class="' . $class . '">&nbsp;<a href="';
 				if ($this->javascript) {
 					$s .= 'javascript:' . $this->javascript . '(' . $this->active . ', ' . $k . ')';
@@ -69,8 +78,8 @@ class CTabBox extends w2p_Theme_TabBox {
 				} else {
 					$s .= $this->baseHRef . 'tab=' . $k;
 				}
-				$s .= '">' . ($v[2] ? $v[1] : $AppUI->_($v[1])) . '</a>&nbsp;</td>';
-				$s .= '<td valign="middle" ><img id="righttab_' . $k . '" src="./style/' . $uistyle . '/images/bar_top_' . $sel . 'right.gif" border="0" alt="" /></td>';
+				$s .= '">' . ($v[2] ? $v[1] : $this->_AppUI->_($v[1])) . '</a>&nbsp;</td>';
+				$s .= '<td valign="middle" ><img id="righttab_' . $k . '" src="./style/' . $this->_uistyle . '/images/bar_top_' . $sel . 'right.gif" border="0" alt="" /></td>';
 				$s .= '<td class="tabsp"><img src="' . w2PfindImage('shim.gif') . '" alt=""/></td>';
 			}
 			$s .= '</table></td></tr>';
@@ -80,8 +89,8 @@ class CTabBox extends w2p_Theme_TabBox {
 			$s .= '<table width="100%" cellspacing="0" cellpadding="0" border="0">';
 			$s .= '<tbody>';
 			$s .= '<tr>';
-			$s .= '	<td valign="bottom" width="100%" background="./style/' . $uistyle . '/images/tabbox_top.jpg" align="left">';
-			$s .= '		<img src="./style/' . $uistyle . '/images/tabbox_top.jpg" alt=""/>';
+			$s .= '	<td valign="bottom" width="100%" background="./style/' . $this->_uistyle . '/images/tabbox_top.jpg" align="left">';
+			$s .= '		<img src="./style/' . $this->_uistyle . '/images/tabbox_top.jpg" alt=""/>';
 			$s .= '	</td>';
 			$s .= '</tr>';
 			$s .= '</tbody>';
@@ -118,52 +127,13 @@ class CTabBox extends w2p_Theme_TabBox {
 }
 
 function styleRenderBoxTop() {
-	global $AppUI, $currentInfoTabId;
-	$uistyle = $AppUI->getPref('UISTYLE') ? $AppUI->getPref('UISTYLE') : w2PgetConfig('host_style');
-	if (!$uistyle) {
-		$uistyle = 'web2project';
-	}
-	if ($currentInfoTabId) {
-		return '';
-	}
-	$ret = '<table width="100%" cellspacing="0" cellpadding="0" border="0">';
-	$ret .= '<tbody>';
-	$ret .= '<tr>';
-	$ret .= '	<td valign="bottom" height="17" style="background:url(./style/' . $uistyle . '/images/box_left_corner.jpg);" align="left">';
-	$ret .= '		<img width="19" height="17" alt="" src="./style/' . $uistyle . '/images/box_left_corner.jpg"/>';
-	$ret .= '	</td>';
-	$ret .= '	<td valign="bottom" width="100%" style="background:url(./style/' . $uistyle . '/images/box_top.jpg);" align="left">';
-	$ret .= '		<img width="19" height="17" alt="" src="./style/' . $uistyle . '/images/box_top.jpg"/>';
-	$ret .= '	</td>';
-	$ret .= '	<td valign="bottom" style="background:url(./style/' . $uistyle . '/images/box_right_corner.jpg);" align="right">';
-	$ret .= '		<img width="19" height="17" alt="" src="./style/' . $uistyle . '/images/box_right_corner.jpg"/>';
-	$ret .= '	</td>';
-	$ret .= '</tr>';
-	$ret .= '</tbody>';
-	$ret .= '</table>';
-	return $ret;
+    global $AppUI;
+    $theme = new style_w2psnowball($AppUI);
+    return $theme->styleRenderBoxTop();
 }
 
 function styleRenderBoxBottom() {
-	global $AppUI;
-	$uistyle = $AppUI->getPref('UISTYLE') ? $AppUI->getPref('UISTYLE') : w2PgetConfig('host_style');
-	if (!$uistyle) {
-		$uistyle = 'web2project';
-	}
-	$ret = '<table width="100%" cellspacing="0" cellpadding="0" border="0">';
-	$ret .= '<tbody>';
-	$ret .= '<tr>';
-	$ret .= '	<td valign="top" height="35" style="background:url(./style/' . $uistyle . '/images/shadow_bttm_left_corner.jpg) no-repeat;" align="left">';
-	$ret .= '		<img width="19" height="35" alt="" src="./style/' . $uistyle . '/images/shadow_bttm_left_corner.jpg"/>';
-	$ret .= '	</td>';
-	$ret .= '	<td valign="top" width="100%" style="background: repeat-x url(./style/' . $uistyle . '/images/shadow_bottom.jpg);" align="left">';
-	$ret .= '		<img width="19" height="35" alt="" src="./style/' . $uistyle . '/images/shadow_bottom.jpg"/>';
-	$ret .= '	</td>';
-	$ret .= '	<td valign="top" style="background:url(./style/' . $uistyle . '/images/shadow_bttm_right_corner.jpg) no-repeat;" align="right">';
-	$ret .= '		<img width="19" height="35" alt="" src="./style/' . $uistyle . '/images/shadow_bttm_right_corner.jpg"/>';
-	$ret .= '	</td>';
-	$ret .= '</tr>';
-	$ret .= '</tbody>';
-	$ret .= '</table>';
-	return $ret;
+    global $AppUI;
+    $theme = new style_w2psnowball($AppUI);
+    return $theme->styleRenderBoxBottom();
 }

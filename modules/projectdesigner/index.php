@@ -74,7 +74,7 @@ if (!$project_id) {
 	$titleBlock->addCrumb('?m=projects', 'projects list');
 	$titleBlock->addCell();
 	if ($canAddProjects) {
-		$titleBlock->addCell('<input type="submit" class="button" value="' . $AppUI->_('new project') . '">', '', '<form action="?m=projects&a=addedit" method="post" accept-charset="utf-8">', '</form>');
+		$titleBlock->addCell('<input type="submit" class="button btn btn-small dropdown-toggle" value="' . $AppUI->_('new project') . '">', '', '<form action="?m=projects&a=addedit" method="post" accept-charset="utf-8">', '</form>');
 	}
 	$titleBlock->show();
 ?>
@@ -99,17 +99,15 @@ if (!$project_id) {
 		echo styleRenderBoxTop();
 	}
 ?>
-	<table border="1" cellpadding="4" cellspacing="0" width="100%" class="std">
-	<form name="prjFrm" action="?m=projectdesigner" method="post" accept-charset="utf-8">
-	<tr>
-		<td nowrap="nowrap" style="border: outset #eeeeee 1px;background-color:#fffff" >
-			<font color="<?php echo bestColor('#ffffff'); ?>">
-				<strong><?php echo $AppUI->_('Project'); ?>: <?php echo arraySelect($projects, 'project_id', 'onchange="submitIt()" class="text" style="width:500px"', 0); ?></strong>
-			</font>
-		</td>
-	</tr>            
-	</form>
-	</table>
+    <form name="prjFrm" action="?m=projectdesigner" method="post" accept-charset="utf-8">
+        <table border="1" cellpadding="4" cellspacing="0" width="100%" class="std">
+            <tr>
+                <td class="projectdesigner">
+                    <?php echo $AppUI->_('Project'); ?>: <?php echo arraySelect($projects, 'project_id', 'onchange="submitIt()" class="text"', 0); ?>
+                </td>
+            </tr>
+        </table>
+    </form>
 <?php
 } else {
 	// check permissions for this record
@@ -174,19 +172,19 @@ if (!$project_id) {
 
 	if ($canAddProjects) {
 		$titleBlock->addCell();
-		$titleBlock->addCell('<input type="submit" class="button" value="' . $AppUI->_('new project') . '">', '', '<form action="?m=projects&a=addedit" method="post" accept-charset="utf-8">', '</form>');
+		$titleBlock->addCell('<input type="submit" class="button btn btn-small dropdown-toggle" value="' . $AppUI->_('new project') . '">', '', '<form action="?m=projects&a=addedit" method="post" accept-charset="utf-8">', '</form>');
 	}
 
 	if ($canAddTasks) {
 		$titleBlock->addCell();
-		$titleBlock->addCell('<input type="submit" class="button" value="' . $AppUI->_('new task') . '">', '', '<form action="?m=tasks&a=addedit&task_project=' . $project_id . '" method="post" accept-charset="utf-8">', '</form>');
+		$titleBlock->addCell('<input type="submit" class="button btn btn-small dropdown-toggle" value="' . $AppUI->_('new task') . '">', '', '<form action="?m=tasks&a=addedit&task_project=' . $project_id . '" method="post" accept-charset="utf-8">', '</form>');
 	}
 	if ($canEditProject) {
 		$titleBlock->addCell();
-		$titleBlock->addCell('<input type="submit" class="button" value="' . $AppUI->_('new event') . '">', '', '<form action="?m=calendar&a=addedit&event_project=' . $project_id . '" method="post" accept-charset="utf-8">', '</form>');
+		$titleBlock->addCell('<input type="submit" class="button btn btn-small dropdown-toggle" value="' . $AppUI->_('new event') . '">', '', '<form action="?m=calendar&a=addedit&event_project=' . $project_id . '" method="post" accept-charset="utf-8">', '</form>');
 
 		$titleBlock->addCell();
-		$titleBlock->addCell('<input type="submit" class="button" value="' . $AppUI->_('new file') . '">', '', '<form action="?m=files&a=addedit&project_id=' . $project_id . '" method="post" accept-charset="utf-8">', '</form>');
+		$titleBlock->addCell('<input type="submit" class="button btn btn-small dropdown-toggle" value="' . $AppUI->_('new file') . '">', '', '<form action="?m=files&a=addedit&project_id=' . $project_id . '" method="post" accept-charset="utf-8">', '</form>');
 		$titleBlock->addCrumb('?m=projects&a=addedit&project_id=' . $project_id, 'edit this project');
 		if ($canDeleteProject) {
 			$titleBlock->addCrumbDelete('delete project', $canDelete, $msg);

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package     web2project\modules\misc
  */
@@ -7,8 +6,6 @@
 if (!isset($AppUI)) {
     $AppUI = new w2p_Core_CAppUI();
 }
-require_once ($AppUI->getLibraryClass('PEAR/BBCodeParser'));
-$bbparser = new HTML_BBCodeParser();
 
 $filters = array('- Filters -');
 

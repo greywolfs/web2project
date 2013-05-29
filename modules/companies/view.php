@@ -36,13 +36,13 @@ $tab = $AppUI->processIntState('CompVwTab', $_GET, 'tab', 0);
 $titleBlock = new w2p_Theme_TitleBlock('View Company', 'handshake.png', $m, "$m.$a");
 $titleBlock->addCell();
 if ($canAdd) {
-    $titleBlock->addCell('<input type="submit" class="button" value="' . $AppUI->_('new company') . '" />', '', '<form action="?m=companies&a=addedit" method="post" accept-charset="utf-8">', '</form>');
+    $titleBlock->addCell('<input type="submit" class="button btn btn-small dropdown-toggle" value="' . $AppUI->_('new company') . '" />', '', '<form action="?m=companies&a=addedit" method="post" accept-charset="utf-8">', '</form>');
 }
 if ($canEdit) {
     if ( $AppUI->isActiveModule('departments') ) {
-        $titleBlock->addCell('<input type="submit" class="button" value="' . $AppUI->_('new department') . '" />', '', '<form action="?m=departments&a=addedit&company_id=' . $company_id . '" method="post" accept-charset="utf-8">', '</form>');
+        $titleBlock->addCell('<input type="submit" class="button btn btn-small dropdown-toggle" value="' . $AppUI->_('new department') . '" />', '', '<form action="?m=departments&a=addedit&company_id=' . $company_id . '" method="post" accept-charset="utf-8">', '</form>');
     }
-	$titleBlock->addCell('<input type="submit" class="button" value="' . $AppUI->_('new project') . '" />', '', '<form action="?m=projects&a=addedit&company_id=' . $company_id . '" method="post" accept-charset="utf-8">', '</form>');
+	$titleBlock->addCell('<input type="submit" class="button btn btn-small dropdown-toggle" value="' . $AppUI->_('new project') . '" />', '', '<form action="?m=projects&a=addedit&company_id=' . $company_id . '" method="post" accept-charset="utf-8">', '</form>');
 }
 $titleBlock->addCrumb('?m=companies', 'company list');
 if ($canEdit) {
@@ -82,15 +82,14 @@ $types = w2PgetSysVal('CompanyType');
 $countries = w2PgetSysVal('GlobalCountries');
 ?>
 
-<table border="0" cellpadding="4" cellspacing="0" width="100%" class="std view">
+<table border="0" cellpadding="4" cellspacing="0" class="std view">
+    <tr>
+        <th colspan="2"><?php echo $company->company_name; ?></th>
+    </tr>
 	<tr>
 		<td valign="top" width="50%">
-			<strong><?php echo $AppUI->_('Details'); ?></strong>
-			<table cellspacing="1" cellpadding="2" width="100%">
-				<tr>
-					<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Company'); ?>:</td>
-                    <?php echo $htmlHelper->createCell('company_name-nolink', $company->company_name); ?>
-				</tr>
+            <strong><?php echo $AppUI->_('Details'); ?></strong>
+			<table cellspacing="1" cellpadding="2" width="100%" class="well">
 				<tr>
 					<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Owner'); ?>:</td>
                     <?php echo $htmlHelper->createCell('contact_displayname', $company->contact_name); ?>
@@ -130,9 +129,9 @@ $countries = w2PgetSysVal('GlobalCountries');
 				</tr>
 			</table>
 		</td>
-		<td width="50%" valign="top">
-			<strong><?php echo $AppUI->_('Description'); ?></strong>
-			<table cellspacing="0" cellpadding="2" border="0" width="100%">
+		<td valign="top" width="50%">
+            <strong><?php echo $AppUI->_('Description'); ?></strong>
+			<table cellspacing="0" cellpadding="2" border="0" width="100%" class="well">
 				<tr>
                     <?php echo $htmlHelper->createCell('company_description', $company->company_description); ?>
 				</tr>		

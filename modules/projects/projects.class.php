@@ -429,14 +429,17 @@ class CProject extends w2p_Core_BaseObject
         return true;
     }
 
-    public function store()
+    protected function hook_preCreate()
     {
-        $stored = false;
+        $q = $this->_getQuery();
+        $this->project_created = $q->dbfnNowWithTZ();
 
-        $this->w2PTrimAll();
-        if (!$this->isValid()) {
-            return false;
-        }
+        parent::hook_preCreate();
+    }
+    protected function hook_preStore()
+    {
+        $q = $this->_getQuery();
+        $this->project_updated = $q->dbfnNowWithTZ();
 
         // ensure changes of state in checkboxes is captured
         $this->project_active = (int) $this->project_active;
@@ -480,77 +483,68 @@ class CProject extends w2p_Core_BaseObject
             $this->project_original_parent = $this->project_id;
         }
 
-        /*
-         * TODO: I don't like the duplication on each of these two branches, but I
-         *   don't have a good idea on how to fix it at the moment...
-         */
-        $q = $this->_getQuery();
-        $this->project_updated = $q->dbfnNowWithTZ();
-        if ($this->{$this->_tbl_key} && $this->canEdit()) {
-            $stored = parent::store();
-        }
-        if (0 == $this->{$this->_tbl_key} && $this->canCreate()) {
-            $this->project_created = $q->dbfnNowWithTZ();
-            $stored = parent::store();
-            
-            if ($stored) {
-                if (0 == $this->project_parent || 0 == $this->project_original_parent) {
-                    $this->project_parent = $this->project_id;
-                    $this->project_original_parent = $this->project_id;
-//TODO: I *really* hate how we have to do the store() twice when we create the project.
-                    $stored = parent::store();
-                }
-            }
-        }
-
-        if ($stored) {
-            //split out related departments and store them seperatly.
-            $q->setDelete('project_departments');
-            $q->addWhere('project_id=' . (int) $this->project_id);
-            $q->exec();
-            $q->clear();
-            $stored_departments = array();
-            if ($this->project_departments) {
-                foreach ($this->project_departments as $department) {
-                    if ($department) {
-                        $q->addTable('project_departments');
-                        $q->addInsert('project_id', $this->project_id);
-                        $q->addInsert('department_id', $department);
-                        $stored_departments[$department] = $this->project_id;
-                        $q->exec();
-                        $q->clear();
-                    }
-                }
-            }
-            $this->stored_departments = $stored_departments;
-
-            //split out related contacts and store them seperatly.
-            $q->setDelete('project_contacts');
-            $q->addWhere('project_id=' . (int) $this->project_id);
-            $q->exec();
-            $q->clear();
-            $stored_contacts = array();
-            if ($this->project_contacts) {
-                foreach ($this->project_contacts as $contact) {
-                    if ($contact) {
-                        $q->addTable('project_contacts');
-                        $q->addInsert('project_id', $this->project_id);
-                        $q->addInsert('contact_id', $contact);
-                        $stored_contacts[$contact] = $this->project_id;
-                        $q->exec();
-                        $q->clear();
-                    }
-                }
-            }
-            $this->stored_contacts = $stored_contacts;
-        }
-        return $stored;
+        parent::hook_preStore();
     }
 
-    protected function hook_postStore() {
-        $custom_fields = new w2p_Core_CustomFields('projects', 'addedit', $this->project_id, 'edit');
-        $custom_fields->bind($_POST);
-        $custom_fields->store($this->project_id); // Store Custom Fields
+    /**
+     * @todo TODO: I *really* hate how we have to do the store() twice when we
+     *   create the project.. it's all because the stupid project_original_parent
+     *   has to equal its own project_id if this is a root project. Ugh.
+     */
+    protected function hook_postCreate()
+    {
+        if (0 == $this->project_parent || 0 == $this->project_original_parent) {
+            $this->project_parent = $this->project_id;
+            $this->project_original_parent = $this->project_id;
+
+            parent::store();
+        }
+
+        parent::hook_postCreate();
+    }
+
+    protected function hook_postStore()
+    {
+        $q = $this->_getQuery();
+        //split out related departments and store them seperatly.
+        $q->setDelete('project_departments');
+        $q->addWhere('project_id=' . (int) $this->project_id);
+        $q->exec();
+        $q->clear();
+        $stored_departments = array();
+        if ($this->project_departments) {
+            foreach ($this->project_departments as $department) {
+                if ($department) {
+                    $q->addTable('project_departments');
+                    $q->addInsert('project_id', $this->project_id);
+                    $q->addInsert('department_id', $department);
+                    $stored_departments[$department] = $this->project_id;
+                    $q->exec();
+                    $q->clear();
+                }
+            }
+        }
+        $this->stored_departments = $stored_departments;
+
+        //split out related contacts and store them seperatly.
+        $q->setDelete('project_contacts');
+        $q->addWhere('project_id=' . (int) $this->project_id);
+        $q->exec();
+        $q->clear();
+        $stored_contacts = array();
+        if ($this->project_contacts) {
+            foreach ($this->project_contacts as $contact) {
+                if ($contact) {
+                    $q->addTable('project_contacts');
+                    $q->addInsert('project_id', $this->project_id);
+                    $q->addInsert('contact_id', $contact);
+                    $stored_contacts[$contact] = $this->project_id;
+                    $q->exec();
+                    $q->clear();
+                }
+            }
+        }
+        $this->stored_contacts = $stored_contacts;
 
         CTask::storeTokenTask($this->_AppUI, $this->project_id);
 
@@ -558,8 +552,6 @@ class CProject extends w2p_Core_BaseObject
     }
     public function notifyOwner($isNotNew)
     {
-        global $locale_char_set;
-
         $mail = new w2p_Utilities_Mail;
 
         $subject = (intval($isNotNew)) ? $this->_AppUI->_('Project updated') . ': ' . $this->project_name : $this->_AppUI->_('Project submitted') . ': ' . $this->project_name;
@@ -572,7 +564,7 @@ class CProject extends w2p_Core_BaseObject
             $emailManager = new w2p_Output_EmailManager($this->_AppUI);
             $body = $emailManager->getProjectNotifyOwner($this, $isNotNew);
 
-            $mail->Subject($subject, $locale_char_set);
+            $mail->Subject($subject, $this->_locale_char_set);
             $mail->Body($body, isset($GLOBALS['locale_char_set']) ? $GLOBALS['locale_char_set'] : '');
             $mail->To($user->user_email, true);
             $mail->Send();
@@ -581,8 +573,6 @@ class CProject extends w2p_Core_BaseObject
 
     public function notifyContacts($isNotNew)
     {
-        global $locale_char_set;
-
         $subject = (intval($isNotNew)) ? "Project Updated: $this->project_name " : "Project Submitted: $this->project_name ";
 
         $users = CProject::getContacts($this->_AppUI, $this->project_id);
@@ -593,7 +583,7 @@ class CProject extends w2p_Core_BaseObject
             foreach ($users as $row) {
                 $mail = new w2p_Utilities_Mail;
                 $mail->Body($body, isset($GLOBALS['locale_char_set']) ? $GLOBALS['locale_char_set'] : '');
-                $mail->Subject($subject, $locale_char_set);
+                $mail->Subject($subject, $this->_locale_char_set);
 
                 if ($mail->ValidEmail($row['contact_email'])) {
                     $mail->To($row['contact_email'], true);
@@ -788,7 +778,6 @@ class CProject extends w2p_Core_BaseObject
 
     public static function updateTaskCache($project_id, $task_id, $project_actual_end_date, $project_task_count)
     {
-
         if ($project_id && $task_id) {
             $q = new w2p_Database_Query();
             $q->addTable('projects');
@@ -803,10 +792,9 @@ class CProject extends w2p_Core_BaseObject
 
     public static function updateTaskCount($projectId, $taskCount)
     {
-
         trigger_error("CProject::updateTaskCount has been deprecated in v2.3 and will be removed by v4.0. Please use CProject::updateTaskCache instead.", E_USER_NOTICE);
 
-        if (intval($projectId) > 0 && intval($taskCount)) {
+        if ((int) $projectId) {
             $q = new w2p_Database_Query();
             $q->addTable('projects');
             $q->addUpdate('project_task_count', intval($taskCount));
@@ -816,10 +804,15 @@ class CProject extends w2p_Core_BaseObject
         }
     }
 
+    /**
+     * Note that this returns the *count* of projects.  If this is zero, it is
+     *   evaluated as false, otherwise it is considered true.
+     *
+     * @param type $projectId
+     * @return type
+     */
     public function hasChildProjects($projectId = 0)
     {
-        // Note that this returns the *count* of projects.  If this is zero, it
-        //   is evaluated as false, otherwise it is considered true.
         $project_id = ($projectId) ? ($this->project_original_parent ? $this->project_original_parent : $this->project_id) : $projectId;
 
         $q = $this->_getQuery();
@@ -842,7 +835,6 @@ class CProject extends w2p_Core_BaseObject
 
     public static function updateHoursWorked($project_id)
     {
-
         $q = new w2p_Database_Query();
         $q->addTable('task_log');
         $q->addTable('tasks');

@@ -7,7 +7,7 @@ if (!defined('W2P_BASE_DIR')) {
  * TODO: This controller is doing a lot of non-controller things that are making
  *   things not reusable and generally difficult to maintain.
  */
-$adjustStartDate = w2PgetParam($_POST, 'set_task_start_date');
+//$adjustStartDate = w2PgetParam($_POST, 'set_task_start_date');
 $del = (int) w2PgetParam($_POST, 'del', 0);
 $task_id = (int) w2PgetParam($_POST, 'task_id', 0);
 $hassign = w2PgetParam($_POST, 'hassign');
@@ -15,11 +15,11 @@ $hperc_assign = w2PgetParam($_POST, 'hperc_assign');
 $hdependencies = w2PgetParam($_POST, 'hdependencies', '');
 $notify = (int) w2PgetParam($_POST, 'task_notify', 0);
 $comment = w2PgetParam($_POST, 'email_comment', '');
-$sub_form = (int) w2PgetParam($_POST, 'sub_form', 0);
+//$sub_form = (int) w2PgetParam($_POST, 'sub_form', 0);
 $new_task_project = (int) w2PgetParam($_POST, 'new_task_project', 0);
-$isNotNew = $task_id;
+//$isNotNew = $task_id;
 
-$action = ($del) ? 'deleted' : 'stored';
+//$action = ($del) ? 'deleted' : 'stored';
 
 // Find the task if we are set
 $task_end_date = null;
@@ -36,10 +36,13 @@ if (!$obj->bind($_POST)) {
 
 // Check to see if the task_project has changed
 if ($new_task_project != 0 and $obj->task_project != $new_task_project) {
-    $taskCount = $obj->getTaskCount($obj->task_project);
-    CProject::updateTaskCount($obj->task_project, --$taskCount);
-    $obj->task_project = $new_task_project;
-    $obj->task_parent = $obj->task_id;
+    $obj->moveTaskBetweenProjects($task_id, $obj->task_project, $new_task_project);
+    /**
+     * We have to bail out for a redirect here or otherwise the store() below
+     *   will screw things up and assign the root task specified back to the
+     *   original project.
+     */
+    $AppUI->redirect('m=projects&a=view&project_id='.$new_task_project);
 }
 
 // Map task_dynamic checkboxes to task_dynamic values for task dependencies.
@@ -96,31 +99,27 @@ if ($obj->task_end_date) {
 // prepare (and translate) the module name ready for the suffix
 if ($del) {
     $result = $obj->delete();
-    if (is_array($result)) {
-        $AppUI->setMsg($msg, UI_MSG_ERROR);
-        $AppUI->redirect('m=tasks&a=view&task_id='.$task_id);
-    } else {
+    if ($result) {
         $AppUI->setMsg('Task deleted');
         $AppUI->redirect('m=projects&a=view&project_id='.$obj->task_project);
+    } else {
+        $AppUI->setMsg($obj->getError(), UI_MSG_ERROR);
+        $AppUI->redirect('m=tasks&a=view&task_id='.$task_id);
     }
 }
 
 $result = $obj->store();
-
-if (is_array($result)) {
-    $AppUI->setMsg($result, UI_MSG_ERROR, true);
-    $AppUI->holdObject($obj);
-    $AppUI->redirect('m=tasks&a=addedit');
-}
 
 if ($result) {
     if (isset($hassign)) {
         $obj->updateAssigned($hassign, $hperc_assign_ar);
     }
 
+    // This call has to be here to make sure that old dependencies are
+    // cleared on save, even if there's no new dependencies
+    $obj->updateDependencies($hdependencies,  $obj->task_id);
     if (isset($hdependencies) && '' != $hdependencies) {
         // there are dependencies set!
-        $obj->updateDependencies($hdependencies,  $obj->task_id);
         $nsd = new w2p_Utilities_Date($obj->get_deps_max_end_date($obj));
 
         if (isset($start_date)) {
@@ -144,10 +143,6 @@ if ($result) {
 		$budgets[$id] = w2PgetParam($_POST, 'budget_'.$id, 0);
 	}
 	$obj->storeBudget($budgets);
-
-    $custom_fields = new w2p_Core_CustomFields($m, 'addedit', $obj->task_id, 'edit');
-    $custom_fields->bind($_POST);
-    $sql = $custom_fields->store($obj->task_id); // Store Custom Fields
 
     // Now add any task reminders
     // If there wasn't a task, but there is one now, and
@@ -174,12 +169,14 @@ if ($result) {
     }
 
     if ($notify) {
-        if ($msg = $obj->notify($comment)) {
-            $AppUI->setMsg($msg, UI_MSG_ERROR);
-        }
+        $obj->notify($comment);
     }
 
-    $AppUI->redirect('m=projects&a=view&project_id='.$obj->task_project);
+    $redirect = 'm=projects&a=view&project_id='.$obj->task_project;
 } else {
-    $AppUI->redirect(ACCESS_DENIED);
+    $AppUI->setMsg($result, UI_MSG_ERROR, true);
+    $AppUI->holdObject($obj);
+    $redirect = 'm=tasks&a=addedit&task_id='.$task_id;
 }
+
+$AppUI->redirect($redirect);

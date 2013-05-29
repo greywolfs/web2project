@@ -22,6 +22,7 @@ class w2p_Theme_TitleBlock {
 	public $helpref = '';
 
     protected $_AppUI = null;
+    protected $_w2Pconfig = null;
     /**
 	 * The constructor
 	 *
@@ -32,6 +33,8 @@ class w2p_Theme_TitleBlock {
 	public function __construct($title, $icon = '', $module = '', $helpref = '') {
 		global $AppUI;
         $this->_AppUI = $AppUI;
+        global $w2Pconfig;
+        $this->_w2Pconfig = $w2Pconfig;
 
         $this->title = $title;
 		$this->icon = $icon;
@@ -70,15 +73,15 @@ class w2p_Theme_TitleBlock {
 	 * Creates a standarised, right-aligned delete bread-crumb and icon.
 	 */
 	public function addCrumbDelete($title, $canDelete = '', $msg = '') {
-		$this->addCrumbRight('<a class="delete" href="javascript:delIt()" title="' . ($canDelete ? '' : $msg) . '"><div>' . $this->_AppUI->_($title) . '</div></a>');
+        $this->addCrumbRight('<a class="delete" href="javascript:delIt()" title="' . ($canDelete ? '' : $msg) . '"><div>' . $this->_AppUI->_($title) . '</div></a>');
 	}
 	/**
 	 * The drawing function
 	 */
 	public function show() {
-		global $a, $m, $w2Pconfig;
+		global $a, $m;
 		$this->loadExtraCrumbs($m, $a);
-		$uistyle = $this->_AppUI->getPref('UISTYLE') ? $this->_AppUI->getPref('UISTYLE') : $w2Pconfig['host_style'];
+		$uistyle = $this->_AppUI->getPref('UISTYLE') ? $this->_AppUI->getPref('UISTYLE') : $this->_w2Pconfig['host_style'];
 		if (!$uistyle) {
 			$uistyle = 'web2project';
 		}
@@ -92,9 +95,13 @@ class w2p_Theme_TitleBlock {
 			$s .= '</div>';
 		}
         $s .= '<h1>' . $this->_AppUI->_($this->title) . '</h1>';
+
         $s .= '<ul class="crumb-right">';
 		foreach ($this->cells1 as $c) {
-			$s .= $c[2] ? $c[2] : '';
+			if ('' == $c[1]) {
+                continue;
+            }
+            $s .= $c[2] ? $c[2] : '';
 			$s .= '<li class="right"' . ($c[0] ? (' ' . $c[0]) : '') . '>';
 			$s .= $c[1] ? $c[1] : '&nbsp;';
 			$s .= '</li>';

@@ -1,13 +1,12 @@
 <?php
-$dialog = w2PgetParam($_GET, 'dialog', 0);
-if ($dialog) {
-	$page_title = '';
-} else {
-	$page_title = ($w2Pconfig['page_title'] == 'web2Project') ? $w2Pconfig['page_title'] . '&nbsp;' . $AppUI->getVersion() : $w2Pconfig['page_title'];
+if (!defined('W2P_BASE_DIR')) {
+    die('You should not access this file directly.');
 }
 
 // Include the file first of all, so that the AJAX methods are printed through xajax below
 require W2P_BASE_DIR . '/includes/ajax_functions.php';
+
+$theme = new style_web2project($AppUI, $m);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -59,7 +58,7 @@ require W2P_BASE_DIR . '/includes/ajax_functions.php';
 
                 <div class="header">
                     <div class="left nav">
-                        <?php echo buildHeaderNavigation($AppUI, 'ul', 'li', '', $m); ?>
+                        <?php echo $theme->buildHeaderNavigation('ul', 'li'); ?>
                     </div>
                     <div class="right" style="margin: 4px;">
                         <?php
@@ -120,9 +119,9 @@ require W2P_BASE_DIR . '/includes/ajax_functions.php';
             <tr>
                 <td valign="top" align="left" width="98%">
                     <?php
-                        echo $AppUI->getMsg();
+                        echo $theme->messageHandler();
                         $AppUI->boxTopRendered = false;
-                        if ($m == 'help' && function_exists('styleRenderBoxTop')) {
-                            echo styleRenderBoxTop();
+                        if ($m == 'help') {
+                            echo $theme->styleRenderBoxTop();
                         }
 //TODO: Basically this entire file is exactly the same as the other two header.php files in core web2project.. - caseydk 2012-07-01

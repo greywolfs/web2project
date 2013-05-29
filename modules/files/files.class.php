@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package     web2project\modules\core
  */
@@ -359,7 +358,6 @@ class CFile extends w2p_Core_BaseObject {
 
 	// parse file for indexing
 	public function indexStrings() {
-		global $w2Pconfig;
         $nwords_indexed = 0;
 
         /* Workaround for indexing large files:
@@ -371,9 +369,9 @@ class CFile extends w2p_Core_BaseObject {
         $index_max_file_size = w2PgetConfig('index_max_file_size', 0);
         if ($this->file_size > 0 && ($index_max_file_size < 0 || (int) $this->file_size <= $index_max_file_size * 1024)) {
             // get the parser application
-            $parser = $w2Pconfig['parser_' . $this->file_type];
+            $parser = $this->_w2Pconfig['parser_' . $this->file_type];
             if (!$parser) {
-                $parser = $w2Pconfig['parser_default'];
+                $parser = $this->_w2Pconfig['parser_default'];
             }
             if (!$parser) {
                 return false;
@@ -452,7 +450,7 @@ class CFile extends w2p_Core_BaseObject {
 
 	//function notifies about file changing
 	public function notify($notify) {
-        global $locale_char_set, $helpdesk_available;
+        global $helpdesk_available;
 
         if ($notify == '1') {
             // if helpdesk_item is available send notification to assigned users
@@ -476,12 +474,12 @@ class CFile extends w2p_Core_BaseObject {
                 $mail = new w2p_Utilities_Mail();
 
                 if ($this->file_task == 0) { //notify all developers
-                    $mail->Subject($this->_project->project_name . '::' . $this->file_name, $locale_char_set);
+                    $mail->Subject($this->_project->project_name . '::' . $this->file_name, $this->_locale_char_set);
                 } else { //notify all assigned users
                     $this->_task = new CTask();
                     $this->_task->overrideDatabase($this->_query);
                     $this->_task->load($this->file_task);
-                    $mail->Subject($this->_project->project_name . '::' . $this->_task->task_name . '::' . $this->file_name, $locale_char_set);
+                    $mail->Subject($this->_project->project_name . '::' . $this->_task->task_name . '::' . $this->file_name, $this->_locale_char_set);
                 }
 
                 $emailManager = new w2p_Output_EmailManager($this->_AppUI);
@@ -541,8 +539,6 @@ class CFile extends w2p_Core_BaseObject {
 	} //notify
 
 	public function notifyContacts($notifyContacts) {
-		global $locale_char_set;
-
         if ($notifyContacts) {
             //if no project specified than we will not do anything
             if ($this->file_project != 0) {
@@ -552,12 +548,12 @@ class CFile extends w2p_Core_BaseObject {
                 $mail = new w2p_Utilities_Mail();
 
                 if ($this->file_task == 0) { //notify all developers
-                  $mail->Subject($this->_AppUI->_('Project') . ': ' . $this->_project->project_name . '::' . $this->file_name, $locale_char_set);
+                  $mail->Subject($this->_AppUI->_('Project') . ': ' . $this->_project->project_name . '::' . $this->file_name, $this->_locale_char_set);
                 } else { //notify all assigned users
                   $this->_task = new CTask();
                   $this->_task->overrideDatabase($this->_query);
                   $this->_task->load($this->file_task);
-                  $mail->Subject($this->_AppUI->_('Project') . ': ' . $this->_project->project_name . '::' . $this->_task->task_name . '::' . $this->file_name, $locale_char_set);
+                  $mail->Subject($this->_AppUI->_('Project') . ': ' . $this->_project->project_name . '::' . $this->_task->task_name . '::' . $this->file_name, $this->_locale_char_set);
                 }
 
                 $emailManager = new w2p_Output_EmailManager($this->_AppUI);

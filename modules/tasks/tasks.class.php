@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package     web2project\modules\core
  */
@@ -77,6 +76,7 @@ class CTask extends w2p_Core_BaseObject
      * 31 = ON, dep tracking, others do track
      */
 
+    protected $_depth = 0;
     /**
      * When calculating a task's start date only consider
      * end dates of tasks with these dynamic values.
@@ -699,8 +699,12 @@ class CTask extends w2p_Core_BaseObject
     {
         $stored = false;
 
-        $q = $this->_getQuery();
-        $this->task_updated = $q->dbfnNowWithTZ();
+        if ($this->task_start_date == '') {
+            $this->task_start_date = '0000-00-00 00:00:00';
+        }
+        if ($this->task_end_date == '') {
+            $this->task_end_date = '0000-00-00 00:00:00';
+        }
 
         if ($this->{$this->_tbl_key} && $this->canEdit()) {
 
@@ -712,12 +716,6 @@ class CTask extends w2p_Core_BaseObject
             $oTsk->overrideDatabase($this->_query);
             $oTsk->load($this->task_id);
 
-            if ($this->task_start_date == '') {
-                $this->task_start_date = '0000-00-00 00:00:00';
-            }
-            if ($this->task_end_date == '') {
-                $this->task_end_date = '0000-00-00 00:00:00';
-            }
             if (($msg = parent::store())) {
                 $this->_error['store'] = $msg;
                 return $msg;
@@ -727,10 +725,6 @@ class CTask extends w2p_Core_BaseObject
             if ($this->task_status != $oTsk->task_status) {
                 $this->updateSubTasksStatus($this->task_status);
             }
-            // Moving this task to another project?
-            if ($this->task_project != $oTsk->task_project) {
-                $this->updateSubTasksProject($this->task_project);
-            }
             if ($this->task_dynamic == 1) {
                 $this->updateDynamics(true);
             }
@@ -738,19 +732,18 @@ class CTask extends w2p_Core_BaseObject
         }
 
         if (0 == $this->{$this->_tbl_key} && $this->canCreate()) {
-            $this->task_created = $q->dbfnNowWithTZ();
-            if ($this->task_start_date == '') {
-                $this->task_start_date = '0000-00-00 00:00:00';
-            }
-            if ($this->task_end_date == '') {
-                $this->task_end_date = '0000-00-00 00:00:00';
-            }
             $stored = parent::store();
         }
 
         return $stored;
     }
 
+    protected function hook_preCreate() {
+        $q = $this->_getQuery();
+        $this->task_created = $q->dbfnNowWithTZ();
+
+        parent::hook_preCreate();
+    }
     protected function hook_postCreate()
     {
         if ($this->task_parent) {
@@ -762,14 +755,14 @@ class CTask extends w2p_Core_BaseObject
     }
     protected function hook_preStore()
     {
-        $this->w2PTrimAll();
-        if (!$this->task_owner) {
-            $this->task_owner = $this->_AppUI->user_id;
-        }
-
         $this->importing_tasks = false;
 
+        $this->w2PTrimAll();
+
+        $q = $this->_getQuery();
+        $this->task_updated = $q->dbfnNowWithTZ();
         $this->task_target_budget = filterCurrency($this->task_target_budget);
+        $this->task_owner = ($this->task_owner) ? $this->task_owner : $this->_AppUI->user_id;
 
         if ($this->task_start_date != '' && $this->task_start_date != '0000-00-00 00:00:00') {
             $this->task_start_date = $this->_AppUI->convertToSystemTZ($this->task_start_date);
@@ -905,7 +898,7 @@ class CTask extends w2p_Core_BaseObject
 //TODO: We need to convert this from static to use ->overrideDatabase() for testing.
         $subProject->load($project_id);
 
-        if ($subProject->project_id != $subProject->project_parent) {
+        if ($subProject->project_parent > 0 && ($subProject->project_id != $subProject->project_parent)) {
             $q = new w2p_Database_Query();
             $q->addTable('tasks');
             $q->addQuery('MIN(task_start_date) AS min_task_start_date');
@@ -918,7 +911,7 @@ class CTask extends w2p_Core_BaseObject
             $q->addTable('tasks');
             $q->addQuery('task_id');
             $q->addWhere('task_represents_project = ' . $subProject->project_id);
-            $task_id = $q->loadResult();
+            $task_id = (int) $q->loadResult();
 
             $task = new CTask();
 //TODO: We need to convert this from static to use ->overrideDatabase() for testing.
@@ -1160,10 +1153,8 @@ class CTask extends w2p_Core_BaseObject
 
     public function notifyOwner()
     {
-        global $locale_char_set;
-
         $mail = new w2p_Utilities_Mail();
-        $mail->Subject($projname . '::' . $this->task_name . ' ' . $this->_AppUI->_($this->_action, UI_OUTPUT_RAW), $locale_char_set);
+        $mail->Subject($projname . '::' . $this->task_name . ' ' . $this->_AppUI->_($this->_action, UI_OUTPUT_RAW), $this->_locale_char_set);
 
         // c = creator
         // a = assignee
@@ -1207,14 +1198,12 @@ class CTask extends w2p_Core_BaseObject
 //TODO: should we resolve $projname ?
     public function notify($comment = '')
     {
-        global $locale_char_set;
-
         $mail = new w2p_Utilities_Mail();
 
 		$project = new CProject();
 		$projname = $project->load($this->task_project)->project_name;
 
-        $mail->Subject($projname . '::' . $this->task_name . ' ' . $this->_AppUI->_($this->_action, UI_OUTPUT_RAW), $locale_char_set);
+        $mail->Subject($projname . '::' . $this->task_name . ' ' . $this->_AppUI->_($this->_action, UI_OUTPUT_RAW), $this->_locale_char_set);
 
         // c = creator
         // a = assignee
@@ -1269,8 +1258,6 @@ class CTask extends w2p_Core_BaseObject
      */
     public function email_log(&$log, $assignees, $task_contacts, $project_contacts, $others, $extras, $specific_user = 0)
     {
-        global $locale_char_set;
-
         $mail_recipients = array();
         $q = $this->_getQuery();
         if ((int) $this->task_id > 0 && (int) $this->task_project > 0) {
@@ -1356,7 +1343,7 @@ class CTask extends w2p_Core_BaseObject
             }
 
             // Build the email and send it out.
-            $char_set = isset($locale_char_set) ? $locale_char_set : '';
+            $char_set = isset($this->_locale_char_set) ? $this->_locale_char_set : '';
             $mail = new w2p_Utilities_Mail();
             // Grab the subject from user preferences
             $prefix = $this->_AppUI->getPref('TASKLOGSUBJ');
@@ -1812,6 +1799,7 @@ class CTask extends w2p_Core_BaseObject
     {
         $q = $this->_getQuery();
         $q->addQuery('td.dependencies_req_task_id, t.task_name, t.task_percent_complete');
+        $q->addQuery('t.task_id, t.task_start_date, t.task_end_date');
         $q->addTable('tasks', 't');
         $q->addTable('task_dependencies', 'td');
         $q->addWhere('td.dependencies_req_task_id = t.task_id');
@@ -1829,6 +1817,7 @@ class CTask extends w2p_Core_BaseObject
     {
         $q = $this->_getQuery();
         $q->addQuery('td.dependencies_task_id, t.task_name, t.task_percent_complete');
+        $q->addQuery('t.task_id, t.task_start_date, t.task_end_date');
         $q->addQuery('task_start_date, task_end_date, task_dynamic');
         $q->addQuery('task_duration, task_duration_type');
         $q->addTable('tasks', 't');
@@ -1995,7 +1984,6 @@ class CTask extends w2p_Core_BaseObject
 
     public function getProject()
     {
-
         $q = $this->_getQuery();
         $q->addTable('projects');
         $q->addQuery('project_name, project_short_name, project_color_identifier');
@@ -2006,13 +1994,16 @@ class CTask extends w2p_Core_BaseObject
     }
 
     //Returns task children IDs
-    public function getChildren()
+    public function getChildren($task_id = 0)
     {
+        if (!$task_id) {
+            $task_id = $this->task_id;
+        }
 
         $q = $this->_getQuery();
         $q->addTable('tasks');
         $q->addQuery('task_id');
-        $q->addWhere('task_id <> ' . (int) $this->task_id . ' AND task_parent = ' . (int) $this->task_id);
+        $q->addWhere('task_id <> ' . (int) $task_id . ' AND task_parent = ' . (int) $task_id);
         $result = $q->loadColumn();
 
         return $result;
@@ -2061,6 +2052,35 @@ class CTask extends w2p_Core_BaseObject
         return array();
     }
 
+    public function getTaskTree($project_id, $task_id = 0)
+    {
+        $this->_depth++;
+
+        $q = $this->_getQuery();
+        $q->addTable('tasks');
+        $q->addQuery('task_id, task_name, task_description, task_end_date, task_start_date');
+        $q->addQuery('task_milestone, task_parent, task_dynamic, task_percent_complete');
+        $q->addWhere('task_project = ' . (int) $project_id);
+        
+        if ($task_id) {
+            $q->addWhere('task_parent = ' . (int) $task_id);
+            $q->addWhere('task_id != ' . (int) $task_id);
+        } else {
+            $q->addWhere('(task_id = task_parent OR task_parent = 0)');
+        }
+        $q->addOrder('task_start_date, task_end_date');
+
+        $tasks = $q->loadHashList('task_id');
+        foreach ($tasks as $task) {
+            $task['depth'] = $this->_depth;
+            $taskTree[$task['task_id']] = $task;
+            $taskTree = arrayMerge($taskTree, $this->getTaskTree($project_id, $task['task_id']));
+        }
+        $this->_depth--;
+
+        return $taskTree;
+    }
+
     /**
      * This function, recursively, updates all tasks status
      * to the one passed as parameter
@@ -2099,38 +2119,46 @@ class CTask extends w2p_Core_BaseObject
     }
 
     /**
+     * This method handles moving the $task_id specified from $project_old to
+     *   $project_new and then updates the corresponding task counts and task
+     *   start/end dates for the projects.
+     *
+     * @todo Get the start/end dates for the cache.. - updateTaskCache
+     *
+     * @param type $task_id
+     * @param type $project_old
+     * @param type $project_new
+     */
+    public function moveTaskBetweenProjects($task_id, $project_old, $project_new)
+    {
+        $this->updateSubTasksProject($project_new, $task_id);
+
+        $taskCount_oldProject = $this->getTaskCount($project_old);
+        CProject::updateTaskCount($project_old, $taskCount_oldProject);
+
+        $taskCount_newProject = $this->getTaskCount($project_new);
+        CProject::updateTaskCount($project_new, $taskCount_newProject);
+    }
+
+    /**
      * This function recursively updates all tasks project
      * to the one passed as parameter
      */
-    public function updateSubTasksProject($new_project, $task_id = null)
+    protected function updateSubTasksProject($new_project, $task_id = 0)
     {
-
-        if (is_null($task_id)) {
+        if (!$task_id) {
             $task_id = $this->task_id;
         }
 
         $q = $this->_getQuery();
         $q->addTable('tasks');
-        $q->addQuery('task_id');
-        $q->addWhere('task_parent = ' . (int) $task_id);
-        $tasks_id = $q->loadColumn();
-        $q->clear();
-
-        if (count($tasks_id) == 0) {
-            return true;
-        }
-
-        // update project of children
-        $q->addTable('tasks');
         $q->addUpdate('task_project', $new_project);
-        $q->addWhere('task_parent = ' . (int) $task_id);
+        $q->addWhere('task_id = ' . (int) $task_id);
         $q->exec();
-        $q->clear();
 
-        foreach ($tasks_id as $id) {
-            if ($id != $task_id) {
-                $this->updateSubTasksProject($new_project, $id);
-            }
+        $task_ids = $this->getChildren($task_id);
+        foreach ($task_ids as $id) {
+            $this->updateSubTasksProject($new_project, $id);
         }
     }
 
@@ -2245,8 +2273,6 @@ class CTask extends w2p_Core_BaseObject
      */
     public function remind($notUsed = null, $notUsed2 = null, $id, $owner, $notUsed = null)
     {
-        global $locale_char_set;
-
         // At this stage we won't have an object yet
         if (!$this->load($id)) {
             return - 1; // No point it trying again later.
@@ -2309,7 +2335,7 @@ class CTask extends w2p_Core_BaseObject
         $body = $emailManager->getTaskRemind($this, $msg, $project_name, $contacts);
 
         $mail = new w2p_Utilities_Mail();
-        $mail->Subject($subject, $locale_char_set);
+        $mail->Subject($subject, $this->_locale_char_set);
 
         foreach ($contacts as $contact) {
             $user_id = $contact['user_id'];
@@ -2320,7 +2346,7 @@ class CTask extends w2p_Core_BaseObject
 
             $body = str_replace('START-TIME', $starts->convertTZ($tz)->format($df), $body);
             $body = str_replace('END-TIME', $expires->convertTZ($tz)->format($df), $body);
-            $mail->Body($body, $locale_char_set);
+            $mail->Body($body, $this->_locale_char_set);
 
             if ($mail->ValidEmail($contact['contact_email'])) {
                 $mail->To($contact['contact_email'], true);
@@ -2390,7 +2416,6 @@ class CTask extends w2p_Core_BaseObject
 //TODO: this method should be moved to CTaskLog
     public function getTaskLogs($taskId, $problem = false)
     {
-
         $q = $this->_getQuery();
         $q->addTable('task_log');
         $q->addQuery('task_log.*, task_log_task as task_id, user_username');
@@ -2522,7 +2547,6 @@ class CTask extends w2p_Core_BaseObject
 
     public function getTaskCount($projectId)
     {
-
         $q = $this->_getQuery();
         $q->addTable('tasks');
         $q->addQuery('COUNT(distinct tasks.task_id) AS total_tasks');
@@ -2532,7 +2556,6 @@ class CTask extends w2p_Core_BaseObject
 
     public static function pinUserTask($userId, $taskId)
     {
-
         $q = new w2p_Database_Query;
         $q->addTable('user_task_pin');
         $q->addInsert('user_id', (int) $userId);
@@ -2547,7 +2570,6 @@ class CTask extends w2p_Core_BaseObject
 
     public static function unpinUserTask($userId, $taskId)
     {
-
         $q = new w2p_Database_Query;
         $q->setDelete('user_task_pin');
         $q->addWhere('user_id = ' . (int) $userId);
@@ -2562,7 +2584,6 @@ class CTask extends w2p_Core_BaseObject
 
     public static function updateHoursWorked($taskId, $totalHours)
     {
-
         $q = new w2p_Database_Query;
         $q->addTable('tasks');
         $q->addUpdate('task_hours_worked', $totalHours + 0);

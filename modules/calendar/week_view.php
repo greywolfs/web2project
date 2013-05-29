@@ -36,13 +36,13 @@ $mm = $this_week->getMonth();
 $yy = $this_week->getYear();
 
 // prepare time period for 'events'
-$first_time = new w2p_Utilities_Date(Date_calc::beginOfWeek($dd, $mm, $yy, FMT_TIMESTAMP_DATE, LOCALE_FIRST_DAY));
+$first_time = new w2p_Utilities_Date(Date_Calc::beginOfWeek($dd, $mm, $yy, FMT_TIMESTAMP_DATE, LOCALE_FIRST_DAY));
 $first_time->setTime(0, 0, 0);
-$last_time = new w2p_Utilities_Date(Date_calc::endOfWeek($dd, $mm, $yy, FMT_TIMESTAMP_DATE, LOCALE_FIRST_DAY));
+$last_time = new w2p_Utilities_Date(Date_Calc::endOfWeek($dd, $mm, $yy, FMT_TIMESTAMP_DATE, LOCALE_FIRST_DAY));
 $last_time->setTime(23, 59, 59);
 
-$prev_week = new w2p_Utilities_Date(Date_calc::beginOfPrevWeek($dd, $mm, $yy, FMT_TIMESTAMP_DATE, LOCALE_FIRST_DAY));
-$next_week = new w2p_Utilities_Date(Date_calc::beginOfNextWeek($dd, $mm, $yy, FMT_TIMESTAMP_DATE, LOCALE_FIRST_DAY));
+$prev_week = new w2p_Utilities_Date(Date_Calc::beginOfPrevWeek($dd, $mm, $yy, FMT_TIMESTAMP_DATE, LOCALE_FIRST_DAY));
+$next_week = new w2p_Utilities_Date(Date_Calc::beginOfNextWeek($dd, $mm, $yy, FMT_TIMESTAMP_DATE, LOCALE_FIRST_DAY));
 
 $links = array();
 
@@ -85,7 +85,7 @@ $titleBlock->addCell('<form action="' . $_SERVER['REQUEST_URI'] . '" method="pos
 $titleBlock->addCell($AppUI->_('Company') . ':');
 $titleBlock->addCell('<form action="'.$_SERVER['REQUEST_URI'].'" method="post" name="pickFilter" accept-charset="utf-8">' . arraySelect($event_filter_list, 'event_filter', 'onchange="document.pickFilter.submit()" class="text"', $event_filter, true) . '</form>');
 $titleBlock->addCell($AppUI->_('Event Filter') . ':');
-$titleBlock->addCell('<form action="?m=calendar&a=addedit&date=' . $today . '" method="post" accept-charset="utf-8">' . '<input type="submit" class="button" value="' . $AppUI->_('New event') . '">' . '</form>');
+$titleBlock->addCell('<form action="?m=calendar&a=addedit&date=' . $today . '" method="post" accept-charset="utf-8">' . '<input type="submit" class="button btn btn-small dropdown-toggle" value="' . $AppUI->_('new event') . '">' . '</form>');
 $titleBlock->show();
 ?>
 <table border="0" cellspacing="0" cellpadding="2" width="100%" class="motitle">

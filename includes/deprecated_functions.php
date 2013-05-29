@@ -233,7 +233,6 @@ function constructTaskTree_pd($task_data, $parents, $all_tasks, $depth = 0) {
 
 // from modules/tasks/tasks.class.php
 /**
- * canTaskAccess()
  * Used to check if a user has task_access to see the task in task list context
  * (This function was optimized to try to use the DB the least possible)
  * TODO:  Remove for v4.0 - caseydk 20 September 2012
@@ -322,4 +321,25 @@ function get_dependencies_pd($task_id) {
 
     $task = new CTask();
 	return $task->getDependencyList($task_id);
+}
+
+/**
+ * Rebuilt this as a class method to override the basic layout, etc information.
+ *   While this is overkill for the core system, it's absolutely necessary for
+ *   good custom theming.
+ *
+ * @param type $AppUI
+ * @param type $rootTag
+ * @param type $innerTag
+ * @param type $dividingToken
+ * @param type $m
+ * @return type 
+ */
+function buildHeaderNavigation($AppUI, $rootTag = '', $innerTag = '', $dividingToken = '', $m = '') {
+    //trigger_error("The buildHeaderNavigation function has been deprecated and will be removed in v4.0. Please use w2p_Theme_Base->buildHeaderNavigation() instead.", E_USER_NOTICE );
+
+    $uistyle = $AppUI->getPref('UISTYLE') ? $AppUI->getPref('UISTYLE') : w2PgetConfig('host_style');
+    $style = 'style_' . str_replace('-', '', $uistyle);
+    $theme = new $style($AppUI, $m);
+    return $theme->buildHeaderNavigation($rootTag, $innerTag, $dividingToken);
 }

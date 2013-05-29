@@ -499,7 +499,7 @@ function showtask(&$arr, $level = 0, $notUsed = true, $today_view = false) {
 		}
 	} elseif (!$today_view) {
 		// No users asigned to task
-		$s .= '<td class="data">-</td>';
+        $s .= $htmlHelper->createCell('other', '-');
 	}
 
 	// duration or milestone
@@ -560,27 +560,16 @@ function showtask_pd(&$arr, $level = 0, $today_view = false) {
 		$s .= '<a href="?m=tasks&a=addedit&task_id=' . $arr['task_id'] . '">' . w2PshowImage('icons/pencil.gif', 12, 12) . '</a>';
 	}
 	$s .= '</td>';
-	// percent complete and priority
+
     $s .= $htmlHelper->createCell('task_percent_complete', $arr['task_percent_complete']);
     $s .= $htmlHelper->createCell('task_priority', $arr['task_priority']);
     $s .= $htmlHelper->createCell('user_task_priority', $arr['user_task_priority']);
+    $s .= $htmlHelper->createCell('other', mb_substr($task_access[$arr['task_access']], 0, 3));
+    $s .= $htmlHelper->createCell('other', mb_substr($types[$arr['task_type']], 0, 3));
+    // reminders set
+    $s .= $htmlHelper->createCell('other', ($arr['queue_id']) ? 'Yes' : '');
+    $s .= $htmlHelper->createCell('other', ($arr['task_status'] == -1) ? 'Yes' : '');
 
-	// access
-	$s .= '<td class="data">';
-	$s .= mb_substr($task_access[$arr['task_access']], 0, 3);
-	$s .= '</td>';
-	// type
-	$s .= '<td class="data">';
-	$s .= mb_substr($types[$arr['task_type']], 0, 3);
-	$s .= '</td>';
-	// type
-	$s .= '<td class="data">';
-	$s .= $arr['queue_id'] ? 'Yes' : '';
-	$s .= '</td>';
-	// inactive
-	$s .= '<td class="data">';
-	$s .= $arr['task_status'] == '-1' ? 'Yes' : '';
-	$s .= '</td>';
 	// add log
 	$s .= '<td align="center" nowrap="nowrap">';
 	if ($arr['task_dynamic'] != 1 && 0 == $arr['task_represents_project']) {
@@ -2194,6 +2183,9 @@ function displayFiles($AppUI, $folder_id, $task_id, $project_id, $company_id) {
 		$s .= $hidden_table;
 		$hidden_table = '';
 	}
+    if (0 == count($files)) {
+        $s .= '<tr><td colspan="' . (count($fieldNames) + 3 ) . '">' . $AppUI->_('No data available') . '</td></tr>';
+    }
 	return $s;
 }
 
@@ -2890,10 +2882,11 @@ function bestColor($bg, $lt = '#ffffff', $dk = '#000000') {
     $g = hexdec(substr($bg, 2, 2));
     $b = hexdec(substr($bg, 4, 2));
 
-    if ($r < $x && $g < $x || $r < $x && $b < $x || $b < $x && $g < $x) {
-        return $lt;
+    $y = 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
+    if ($y < $x) {
+	    return $lt;
     } else {
-        return $dk;
+	    return $dk;
     }
 }
 
@@ -3311,27 +3304,6 @@ function buildPaginationNav($AppUI, $m, $tab, $xpg_totalrecs, $xpg_pagesize, $pa
   }
   $s .= '</table>';
   return $s;
-}
-
-function buildHeaderNavigation($AppUI, $rootTag = '', $innerTag = '', $dividingToken = '', $m = '') {
-    $s = '';
-    $nav = $AppUI->getMenuModules();
-
-    $s .= ($rootTag != '') ? "<$rootTag id=\"headerNav\">" : '';
-    $links = array();
-    foreach ($nav as $module) {
-        if (canAccess($module['mod_directory'])) {
-            $link = ($innerTag != '') ? "<$innerTag>" : '';
-            $class = ($m == $module['mod_directory']) ? ' class="module"' : '';
-            $link .= '<a href="?m=' . $module['mod_directory'] . '"'.$class.'>' . $AppUI->_($module['mod_ui_name']) . '</a>';
-            $link .= ($innerTag != '') ? "</$innerTag>" : '';
-            $links[] = $link;
-        }
-    }
-    $s .= implode($dividingToken, $links);
-    $s .= ($rootTag != '') ? "</$rootTag>" : '';
-
-    return $s;
 }
 
 /**
@@ -4375,4 +4347,371 @@ function getTaskTooltip($task_id, $starts = false, $ends = false ) {
 	$tt .= '</tr>';
 	$tt .= '</table>';
 	return $tt;
+}
+
+/**
+ * Session Handling Functions
+ *
+ * Please note that these functions assume that the database
+ * is accessible and that a table called 'sessions' (with a prefix
+ * if necessary) exists.  It also assumes MySQL date and time
+ * functions, which may make it less than easy to port to
+ * other databases.  You may need to use less efficient techniques
+ * to make it more generic.
+ *
+ * NOTE: index.php and fileviewer.php MUST call w2PsessionStart
+ * instead of trying to set their own sessions.
+ */
+function w2PsessionOpen()
+{
+    return true;
+}
+
+function w2PsessionClose()
+{
+    return true;
+}
+
+function w2PsessionRead($id)
+{
+    $q = new w2p_Database_Query;
+    $q->addTable('sessions');
+    $q->addQuery('session_data');
+    $q->addQuery('UNIX_TIMESTAMP() - UNIX_TIMESTAMP(session_created) as session_lifespan');
+    $q->addQuery('UNIX_TIMESTAMP() - UNIX_TIMESTAMP(session_updated) as session_idle');
+    $q->addWhere('session_id = \'' . $id . '\'');
+    $qid = &$q->exec();
+    if (!$qid || $qid->EOF) {
+        dprint(__file__, __line__, 11, 'Failed to retrieve session ' . $id);
+        $data = '';
+    } else {
+        $max = w2PsessionConvertTime('max_lifetime');
+        $idle = w2PsessionConvertTime('idle_time');
+        // If the idle time or the max lifetime is exceeded, trash the
+        // session.
+        if ($max < $qid->fields['session_lifespan'] || $idle < $qid->fields['session_idle']) {
+            dprint(__file__, __line__, 11, "session $id expired");
+            w2PsessionDestroy($id);
+            $data = '';
+        } else {
+            $data = $qid->fields['session_data'];
+        }
+    }
+    $q->clear();
+    return $data;
+}
+
+function w2PsessionWrite($id, $data)
+{
+    global $AppUI;
+
+    $q = new w2p_Database_Query;
+    $q->addQuery('count(session_id) as row_count');
+    $q->addTable('sessions');
+    $q->addWhere('session_id = \'' . $id . '\'');
+    $row_count = (int) $q->loadResult();
+    $q->clear();
+
+    if ($row_count) {
+        $q->addTable('sessions');
+        $q->addWhere('session_id = \'' . $id . '\'');
+        $q->addUpdate('session_data', $data);
+        if (isset($AppUI)) {
+            $q->addUpdate('session_user', (int) $AppUI->last_insert_id);
+        }
+    } else {
+        $q->addTable('sessions');
+        $q->addInsert('session_id', $id);
+        $q->addInsert('session_data', $data);
+        $q->addInsert('session_created', $q->dbfnNowWithTZ());
+    }
+    $q->exec();
+    $q->clear();
+    return true;
+}
+
+function w2PsessionDestroy($id)
+{
+    $q = new w2p_Database_Query;
+    $q->addTable('user_access_log');
+    $q->addUpdate('date_time_out', $q->dbfnNowWithTZ());
+    $q2 = new w2p_Database_Query;
+    $q2->addTable('sessions');
+    $q2->addQuery('session_user');
+    $q2->addWhere('session_id = \'' . $id . '\'');
+    $q->addWhere('user_access_log_id = ( ' . $q2->prepare() . ' )');
+    $q->exec();
+    $q->clear();
+    $q2->clear();
+
+    $q->setDelete('sessions');
+    $q->addWhere('session_id = \'' . $id . '\'');
+    $q->exec();
+    $q->clear();
+
+    return true;
+}
+
+function w2PsessionGC()
+{
+    global $AppUI;
+
+    $max = w2PsessionConvertTime('max_lifetime');
+    $idle = w2PsessionConvertTime('idle_time');
+    // First pass is to kill any users that are logged in at the time of the session.
+    $where = 'UNIX_TIMESTAMP() - UNIX_TIMESTAMP(session_updated) > ' . $idle . ' OR UNIX_TIMESTAMP() - UNIX_TIMESTAMP(session_created) > ' . $max;
+    $q = new w2p_Database_Query;
+    $q->addTable('user_access_log');
+    $q->addUpdate('date_time_out', $q->dbfnNowWithTZ());
+    $q2 = new w2p_Database_Query;
+    $q2->addTable('sessions');
+    $q2->addQuery('session_user');
+    $q2->addWhere($where);
+    $q->addWhere('user_access_log_id IN ( ' . $q2->prepare() . ' )');
+    $q->exec();
+    $q->clear();
+    $q2->clear();
+
+    // Now we simply delete the expired sessions.
+    $q->setDelete('sessions');
+    $q->addWhere($where);
+    $q->exec();
+    $q->clear();
+    if (w2PgetConfig('session_gc_scan_queue')) {
+        // We need to scan the event queue.  If $AppUI isn't created yet
+        // And it isn't likely that it will be, we create it and run the
+        // queue scanner.
+        if (!isset($AppUI)) {
+            $AppUI = new w2p_Core_CAppUI();
+            $queue = new w2p_Core_EventQueue();
+            $queue->scan();
+        }
+    }
+    return true;
+}
+
+function w2PsessionConvertTime($key)
+{
+    $key = 'session_' . $key;
+
+    // If the value isn't set, then default to 1 day.
+    if (!w2PgetConfig($key, 0)) {
+        return 86400;
+    }
+
+    $numpart = (int) w2PgetConfig($key);
+    $modifier = substr(w2PgetConfig($key), -1);
+    if (!is_numeric($modifier)) {
+        switch ($modifier) {
+            case 'h':
+                $numpart *= 3600;
+                break;
+            case 'd':
+                $numpart *= 86400;
+                break;
+            case 'm':
+                $numpart *= (86400 * 30);
+                break;
+            case 'y':
+                $numpart *= (86400 * 365);
+                break;
+        }
+    }
+    return $numpart;
+}
+
+function w2PsessionStart()
+{
+    session_name('web2project');
+    if (ini_get('session.auto_start') > 0) {
+        session_write_close();
+    }
+    if (w2PgetConfig('session_handling') == 'app') {
+        ini_set('session.save_handler', 'user');
+        register_shutdown_function('session_write_close');
+        session_set_save_handler('w2PsessionOpen', 'w2PsessionClose', 'w2PsessionRead', 'w2PsessionWrite', 'w2PsessionDestroy', 'w2PsessionGC');
+        $max_time = w2PsessionConvertTime('max_lifetime');
+    } else {
+        $max_time = 0; // Browser session only.
+    }
+
+    $url_parts = array();
+    $cookie_dir = '';
+
+    // Try and get the correct path to the base URL.
+    preg_match('_^(https?://)([^/]+)(:0-9]+)?(/.*)?$_i', w2PgetConfig('base_url'), $url_parts);
+
+    if (isset($url_parts[4])) {
+        $cookie_dir = $url_parts[4];
+    }
+
+    if (substr($cookie_dir, 0, 1) != '/') {
+        $cookie_dir = '/' . $cookie_dir;
+    }
+    if (substr($cookie_dir, -1) != '/') {
+        $cookie_dir .= '/';
+    }
+
+    session_set_cookie_params($max_time, $cookie_dir);
+    session_start();
+}
+
+function db_connect($host = 'localhost', $dbname, $user = 'root', $passwd = '', $persist = false) {
+	global $db, $ADODB_FETCH_MODE;
+
+	switch (strtolower(trim(w2PgetConfig('dbtype')))) {
+		case 'oci8':
+		case 'oracle':
+			if ($persist) {
+				$db->PConnect($host, $user, $passwd, $dbname) or die('FATAL ERROR: Connection to database server failed');
+			} else {
+				$db->Connect($host, $user, $passwd, $dbname) or die('FATAL ERROR: Connection to database server failed');
+			}
+			if (!defined('ADODB_ASSOC_CASE')) define('ADODB_ASSOC_CASE', 0);
+			break;
+		default:
+		//mySQL
+			if ($persist) {
+				$db->PConnect($host, $user, $passwd, $dbname) or die('FATAL ERROR: Connection to database server failed');
+			} else {
+				$db->Connect($host, $user, $passwd, $dbname) or die('FATAL ERROR: Connection to database server failed');
+			}
+	}
+
+	$ADODB_FETCH_MODE = ADODB_FETCH_BOTH;
+}
+
+function db_error() {
+	global $db;
+	if (!is_object($db)) {
+		dprint(__file__, __line__, 0, 'Database object does not exist.');
+	}
+	return $db->ErrorMsg();
+}
+
+function db_errno() {
+	global $db;
+	if (!is_object($db)) {
+		dprint(__file__, __line__, 0, 'Database object does not exist.');
+	}
+	return $db->ErrorNo();
+}
+
+function db_insert_id() {
+	global $db;
+	if (!is_object($db)) {
+		dprint(__file__, __line__, 0, 'Database object does not exist.');
+	}
+	return $db->Insert_ID();
+}
+
+function db_exec($sql) {
+	global $db, $w2p_performance_dbtime, $w2p_performance_old_dbqueries;
+
+	if (W2P_PERFORMANCE_DEBUG) {
+		$startTime = array_sum(explode(' ', microtime()));
+	}
+
+	if (!is_object($db)) {
+		dprint(__file__, __line__, 0, 'Database object does not exist.');
+	}
+	$qid = $db->Execute($sql);
+	dprint(__file__, __line__, 10, $sql);
+	if (db_error()) {
+		dprint(__file__, __line__, 0, "Error executing: <pre>$sql</pre>");
+		// Useless statement, but it is being executed only on error,
+		// and it stops infinite loop.
+		$db->Execute($sql);
+		if (!db_error()) {
+			echo '<script language="JavaScript"> location.reload(); </script>';
+		}
+	}
+	if (!$qid && preg_match('/^\<select\>/i', $sql)) {
+		dprint(__file__, __line__, 0, $sql);
+	}
+
+	if (W2P_PERFORMANCE_DEBUG) {
+		++$w2p_performance_old_dbqueries;
+		$w2p_performance_dbtime += array_sum(explode(' ', microtime())) - $startTime;
+	}
+
+	return $qid;
+}
+
+function db_free_result($cur) {
+	// TODO
+	//	mysql_free_result( $cur );
+	// Maybe it's done my Adodb
+	if (!is_object($cur)) {
+		dprint(__file__, __line__, 0, 'Invalid object passed to db_free_result.');
+	}
+	$cur->Close();
+}
+
+function db_num_rows($qid) {
+	if (!is_object($qid)) {
+		dprint(__file__, __line__, 0, 'Invalid object passed to db_num_rows.');
+	}
+	return $qid->RecordCount();
+}
+
+function db_fetch_row(&$qid) {
+	if (!is_object($qid)) {
+		dprint(__file__, __line__, 0, 'Invalid object passed to db_fetch_row.');
+	}
+	return $qid->FetchRow();
+}
+
+function db_fetch_assoc(&$qid) {
+	if (!is_object($qid)) {
+		dprint(__file__, __line__, 0, 'Invalid object passed to db_fetch_assoc.');
+	}
+	return $qid->FetchRow();
+}
+
+function db_fetch_array(&$qid) {
+	if (!is_object($qid)) {
+		dprint(__file__, __line__, 0, 'Invalid object passed to db_fetch_array.');
+	}
+	$result = $qid->FetchRow();
+	// Ensure there are numerics in the result.
+	if ($result && !isset($result[0])) {
+		$ak = array_keys($result);
+		foreach ($ak as $k => $v) {
+			$result[$k] = $result[$v];
+		}
+	}
+	return $result;
+}
+
+function db_fetch_object($qid) {
+	if (!is_object($qid)) {
+		dprint(__file__, __line__, 0, 'Invalid object passed to db_fetch_object.');
+	}
+	return $qid->FetchNextObject(false);
+}
+
+function db_escape($str) {
+	global $db;
+	return substr($db->qstr($str), 1, -1);
+}
+
+function db_version() {
+	return 'ADODB';
+}
+
+function db_unix2dateTime($time) {
+	global $db;
+	return $db->DBDate($time);
+}
+
+function db_dateTime2unix($time) {
+	global $db;
+
+	return $db->UnixDate($time);
+
+	// TODO - check if it's used anywhere...
+	//	if ($time == '0000-00-00 00:00:00') {
+	//		return -1;
+	//	}
 }
