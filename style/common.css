@@ -338,7 +338,7 @@ table.list tr:hover td._name {
  */
 tr.done td._date, tr.done td._datetime, tr.done td._duration, tr.done td._in {
     background-color:#aaddaa;
-    color:#00000;
+    color:#000000;
 }
 
 tr.late td._date, tr.late td._datetime, tr.late td._duration, tr.late td._in {
@@ -527,7 +527,7 @@ table.minititle th {
     font-weight: normal;
 }
 
-bordertable, .bordertable{
+.bordertable{
     border: 1px black solid;
 }
 
