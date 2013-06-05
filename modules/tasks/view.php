@@ -379,6 +379,7 @@ function delIt() {
                 </tr>
                 <?php }
                 $contacts = $obj->getContacts(null, $task_id);
+				$task_contacts=$contacts;
                 if (count($contacts)) {
                     echo '<tr><td colspan="3"><strong>' . $AppUI->_('Task Contacts') . '</strong></td></tr>';
                     echo '<tr><td colspan="3" class="hilite">';
@@ -410,11 +411,25 @@ function delIt() {
 </table>
 
 <?php
+function is_tasks_member(){
+	global $users, $task_contacts, $AppUI, $obj;
+	foreach ($users as $user){
+		if ($AppUI->user_id==$user['user_id'])
+			return true;
+	}
+	if ($AppUI->user_id==$obj->task_owner)
+		return true;
+	foreach ($task_contacts as $contact){
+		if ($AppUI->user_id==$contact['contact_id'])
+			return true;
+	}
+	return false;
+}
 $query_string = '?m=tasks&a=view&task_id=' . $task_id;
 $tabBox = new CTabBox('?m=tasks&a=view&task_id=' . $task_id, '', $tab);
 
 $tabBox_show = 0;
-if ($obj->task_dynamic != 1 && 0 == $obj->task_represents_project) {
+if ($obj->task_dynamic != 1 && 0 == $obj->task_represents_project && is_tasks_member()) {
 	// tabbed information boxes
 	$tabBox_show = 1;
 	if (canView('task_log')) {
