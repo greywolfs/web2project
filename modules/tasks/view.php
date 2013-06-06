@@ -56,13 +56,13 @@ $titleBlock->addCrumb('?m=tasks', 'tasks list');
 if ($canReadProject) {
 	$titleBlock->addCrumb('?m=projects&a=view&project_id=' . $obj->task_project, 'view this project');
 }
-if ($canEdit && 0 == $obj->task_represents_project) {
+if ($canEdit && 0 == $obj->task_represents_project && is_tasks_member()) {
 	$titleBlock->addCrumb('?m=tasks&a=addedit&task_id=' . $task_id, 'edit this task');
 }
 if ($obj->task_represents_project) {
     $titleBlock->addCrumb('?m=projects&a=view&project_id=' . $obj->task_represents_project, 'view subproject');
 }
-if ($canDelete) {
+if ($canDelete && is_tasks_member()) {
 	$titleBlock->addCrumbDelete('delete task', $canDelete, $msg);
 }
 $titleBlock->show();
