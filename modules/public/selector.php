@@ -17,6 +17,12 @@ $q->addTable($table);
 $query_result = false;
 
 switch ($table) {
+	case 'resources':
+		$title='Resources';
+		$q->addQuery('resource_id, resource_name');
+		$q->addOrder('resource_name');
+		$resultList = $q->loadHashList();
+		break;
 	case 'companies':
 		$obj = new CCompany;
 		$title = 'Company';
