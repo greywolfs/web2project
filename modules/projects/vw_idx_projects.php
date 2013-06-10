@@ -248,11 +248,13 @@ if (count($fields) > 0) {
                                 $tmpProject->project_id = $row['project_id'];
                                 $dept_array = $tmpProject->getDepartmentList();
                                 $s .= '<td class="data _list">';
-                                foreach ($dept_array as $dept) {
-                                    $s .= '<a href="?m=departments&a=view&dept_id='.$dept['dept_id'].'">';
-                                    $s .= $dept['dept_name'];
-                                    $s .= '</a>';
-                                    $s .= '<br />';
+                                if (is_array($dept_array)) {
+                                    foreach ($dept_array as $dept) {
+                                        $s .= '<a href="?m=departments&a=view&dept_id='.$dept['dept_id'].'">';
+                                        $s .= $dept['dept_name'];
+                                        $s .= '</a>';
+                                        $s .= '<br />';
+                                    }
                                 }
                                 $s .= '</td>';
                                 break;
@@ -286,7 +288,7 @@ if (count($fields) > 0) {
 			?>
 				<tr>
 					<td colspan="25" align="right">
-                        <input type="submit" class="button" value="<?php echo $AppUI->_('Update projects status'); ?>" />
+                        <input type="submit" class="btn btn-primary btn-mini" value="<?php echo $AppUI->_('Update projects status'); ?>" />
                         <input type="hidden" name="update_project_status" value="1" />
                         <input type="hidden" name="m" value="projects" />
                         <?php echo arraySelect($pstatus, 'project_status', 'size="1" class="text"', $project_status_filter + 1, true); ?>

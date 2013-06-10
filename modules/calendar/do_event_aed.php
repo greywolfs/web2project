@@ -55,7 +55,7 @@ if (!$clashRedirect) {
     if (!$result) {
         $AppUI->setMsg($result, UI_MSG_ERROR, true);
         $AppUI->holdObject($obj);
-        $AppUI->redirect('m=calendar&a=addedit');
+        $AppUI->redirect('m=calendar&a=addedit&event_id=' . $obj->event_id);
     }
 
     if ($result) {
