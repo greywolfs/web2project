@@ -1414,6 +1414,8 @@ class CTask extends w2p_Core_BaseObject
         $q->addTable('tasks', 't');
         if ($user_id) {
             $q->innerJoin('user_tasks', 'ut', 't.task_id=ut.task_id');
+			$q->leftJoin('task_contacts', 'tc', 't.task_id=tc.task_id');
+			$q->leftJoin('users', 'u', 'tc.contact_id=u.user_contact');
         }
         $q->innerJoin('projects', 'projects', 't.task_project = projects.project_id');
         $q->innerJoin('companies', 'companies', 'projects.project_company = companies.company_id');
@@ -1427,7 +1429,7 @@ class CTask extends w2p_Core_BaseObject
             $q->addWhere('project_status <> ' . $template_status);
         }
         if ($user_id) {
-            $q->addWhere('ut.user_id = ' . (int) $user_id);
+            $q->addWhere('(ut.user_id = ' . (int) $user_id . ' or t.task_owner = ' . (int) $user_id . ' or u.user_id = ' . (int) $user_id . ')');
         }
 
         if ($company_id) {

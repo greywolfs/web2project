@@ -4198,7 +4198,7 @@ function getEventTooltip($event_id) {
  */
 function getTaskLinks($startPeriod, $endPeriod, &$links, $strMaxLen, $company_id = 0, $minical = false) {
 	global $a, $AppUI;
-	$tasks = CTask::getTasksForPeriod($startPeriod, $endPeriod, $company_id, 0);
+	$tasks = CTask::getTasksForPeriod($startPeriod, $endPeriod, $company_id, $AppUI->user_id);
 	$tf = $AppUI->getPref('TIMEFORMAT');
 	//subtract one second so we don't have to compare the start dates for exact matches with the startPeriod which is 00:00 of a given day.
 	$startPeriod->subtractSeconds(1);
