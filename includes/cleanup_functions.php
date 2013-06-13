@@ -3039,7 +3039,7 @@ function w2PgetUsers() {
 
 	$q = new w2p_Database_Query;
 	$q->addTable('users');
-	$q->addQuery('user_id, concat_ws(\' \', contact_first_name, contact_last_name) as name');
+	$q->addQuery('user_id, concat_ws(\' \', contact_last_name, contact_first_name) as name');
 	$q->addJoin('contacts', 'con', 'con.contact_id = user_contact', 'inner');
 	$q->addOrder('contact_first_name,contact_last_name');
 
@@ -3062,7 +3062,7 @@ function w2PgetUsers() {
 	return $q->loadHashList();
 }
 
-function w2PgetUsersList($stub = null, $where = null, $orderby = 'contact_first_name, contact_last_name') {
+function w2PgetUsersList($stub = null, $where = null, $orderby = 'contact_last_name, contact_first_name') {
 	global $AppUI;
 	$q = new w2p_Database_Query;
 	$q->addTable('users');
@@ -3097,7 +3097,7 @@ function w2PgetUsersList($stub = null, $where = null, $orderby = 'contact_first_
 	return $q->loadList();
 }
 
-function w2PgetUsersHashList($stub = null, $where = null, $orderby = 'contact_first_name, contact_last_name') {
+function w2PgetUsersHashList($stub = null, $where = null, $orderby = 'contact_last_name, contact_first_name') {
 	global $AppUI;
 	$q = new w2p_Database_Query;
 	$q->addTable('users');
