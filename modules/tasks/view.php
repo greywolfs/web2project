@@ -413,6 +413,8 @@ function delIt() {
 <?php
 function is_tasks_member(){
 	global $users, $task_contacts, $AppUI, $obj;
+	if ($AppUI->user_is_admin)
+		return true;
 	foreach ($users as $user){
 		if ($AppUI->user_id==$user['user_id'])
 			return true;
