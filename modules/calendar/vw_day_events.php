@@ -70,10 +70,7 @@ if ($other_users) {
 
 	if (($rows = w2PgetUsersList())) {
 		foreach ($rows as $row) {
-			if ($user_id == $row['user_id'])
-				$html .= '<option value="' . $row['user_id'] . '" selected="selected">' . $row['contact_first_name'] . ' ' . $row['contact_last_name'];
-			else
-				$html .= '<option value="' . $row['user_id'] . '">' . $row['contact_first_name'] . ' ' . $row['contact_last_name'];
+			$html .= '<option value="' . $row['user_id'] . '"' . ($user_id == $row['user_id']?' selected="selected"':'') . '>' . $row['contact_display_name'] . '</option>';
 		}
 	}
 	$html .= '</select>';
