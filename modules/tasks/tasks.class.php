@@ -544,6 +544,7 @@ class CTask extends w2p_Core_BaseObject
             $orig_task['task_id'] = 0;
             $orig_task['task_project'] = $to_project_id;
             $orig_task['task_sequence'] = 0;
+			$orig_task['task_owner']=$_SESSION['AppUI']->user_id;
 
             $old_parents[$orig_id] = $orig_task['task_parent'];
             $orig_task['task_parent'] = 0;
