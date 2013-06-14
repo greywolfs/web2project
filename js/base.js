@@ -861,3 +861,64 @@ AllByTag.show = function(tagName,dispType) {
 AllByTag.hide = function(tagName,dispType) {
   AllByTag.setStyleDisplay(tagName, 'none');
 };
+
+
+$(document).ready(function(){
+	var all_options={};
+	var all_filters={};
+	$('select.with_filter').each(function(){
+		all_options[$(this).attr('id')]=$('option', this);
+		all_filters[$(this).attr('id')]=[];
+	});
+	$('select.filter_select').each(function(){
+		var filter=$(this);
+		var select_name=$(this).attr('filter_select');
+		all_filters[select_name][all_filters[select_name].length]=function(options){
+			var filtered_option=[];
+			if (filter.val()!=0){
+				var filter_class=select_name+filter.val();
+				options.each(function() {
+					if ($(this).hasClass(filter_class))
+					{
+						filtered_option.push(this);
+					}
+				});
+			}else{
+				filtered_option=options;
+			}
+			return filtered_option;
+		};
+	});
+	$('input.filter_select').each(function(){
+		var filter=$(this);
+		var select_name=$(this).attr('filter_select');
+		all_filters[select_name][all_filters[select_name].length]=function(options){
+			var filtered_option=[];
+			var search_text=filter.val().toLowerCase();
+			for (var i=0;i<options.length;i++){
+				if (options[i].innerText.toLowerCase().search(search_text)!=-1)
+				{
+					filtered_option.push(options[i]);
+				}
+			}
+			return filtered_option;
+		};
+	});
+	function filtered_data_in_select(select_name){
+		var options=all_options[select_name];
+		var select=$('#'+select_name);
+		select.empty();
+		for (var i=0;i<all_filters[select_name].length;i++){
+			options=all_filters[select_name][i](options);
+		}
+		for (var i=0;i<options.length;i++){
+			select.append(options[i]);
+		}
+	}
+	$('select.filter_select').change(function(){
+		filtered_data_in_select($(this).attr('filter_select'));
+	});
+	$('input.filter_select').keypress(function(){
+		filtered_data_in_select($(this).attr('filter_select'));
+	});
+});

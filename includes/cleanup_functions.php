@@ -2891,6 +2891,33 @@ function bestColor($bg, $lt = '#ffffff', $dk = '#000000') {
 }
 
 ##
+## returns a select box with filter and a select box based on an array and input for filter
+##
+function arraySelectPro(&$select_array, $select_name, $select_attribs, &$filter_array, $translate = false) {
+	global $AppUI;
+	if (!is_array($select_array)) {
+		dprint(__file__, __line__, 0, 'arraySelect called with no array');
+		return '';
+	}
+	reset($select_array);
+	$s = '<select filter_select="' . $select_name . '" class="filter_select">';
+	foreach ($filter_array as $filterId=>$filterName){
+		$s.='<option value="'.$filterId.'">'.$filterName.'</option>';
+	}
+	$s .= '</select><br>';
+	$s .= '<select id="' . $select_name . '" name="' . $select_name . '" ' . $select_attribs . '>';
+	foreach ($select_array as $selected_id => $selected_data) {
+		if ($translate) {
+			$selected_data['name'] = $AppUI->_($selected_data['name']);
+		}
+		$s .= '<option value="' . $selected_id . '"' . (($selected_data['selected']) ? ' selected="selected"' : '') . ' class="'.$select_name.$selected_data['filter_id'].'">' . $selected_data['name'] . '</option>';
+	}
+	$s .= '</select><br>';
+	$s .= '<input type="text" filter_select="' . $select_name . '" class="filter_select">';
+	return $s;
+}
+
+##
 ## returns a select box based on an key,value array where selected is based on key
 ##
 function arraySelect(&$arr, $select_name, $select_attribs, $selected, $translate = false) {

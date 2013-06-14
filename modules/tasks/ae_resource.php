@@ -28,6 +28,19 @@ foreach ($assignedUsers as $user_id => $data) {
 	$initPercAsignment .= "$user_id={$data['perc_assignment']};";
 }
 
+
+$q =  new w2p_Database_Query;
+$q->addQuery('u.user_id, dept.dept_id');
+$q->addTable('users', 'u');
+$q->leftJoin('contacts', 'con', 'con.contact_id = user_contact');
+$q->leftJoin('departments', 'dept', 'con.contact_department=dept.dept_id');
+$hash =$q->loadHashList();
+$user_for_select=array();
+foreach ($users as $user_id=>$user_name){
+	$user_for_select[$user_id]['name']=$user_name;
+	$user_for_select[$user_id]['filter_id']=$hash[$user_id];
+	$user_for_select[$user_id]['selected']=false;
+}
 ?>
 <script language="javascript" type="text/javascript">
 <?php
@@ -54,7 +67,7 @@ for ($i = 1, $i_cmp = sizeof($keys); $i < $i_cmp; $i++) {
                     </tr>
                     <tr>
                         <td>
-                            <?php echo arraySelect($users, 'resources', 'style="width:220px" size="10" class="text" multiple="multiple" ', null); ?>
+                            <?php echo arraySelectPro($user_for_select, 'resources', 'style="width:220px" size="10" class="text with_filter" multiple="multiple" ', $department_selection_list); ?>
                         </td>
                         <td>
                             <?php echo arraySelect($assigned, 'assigned', 'style="width:220px" size="10" class="text" multiple="multiple" ', null); ?>
