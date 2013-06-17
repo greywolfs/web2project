@@ -88,10 +88,10 @@ class CContact extends w2p_Core_BaseObject
          * not through the add/edit UI.
          */
         if (mb_strlen($this->contact_order_by) <= 1) {
-            $this->contact_order_by = mb_trim($this->contact_first_name . ' ' . $this->contact_last_name);
+            $this->contact_order_by = mb_trim($this->contact_last_name . ' ' . $this->contact_first_name);
         }
         if (mb_strlen($this->contact_display_name) <= 1) {
-            $this->contact_display_name = mb_trim($this->contact_first_name . ' ' . $this->contact_last_name);
+            $this->contact_display_name = mb_trim($this->contact_last_name . ' ' . $this->contact_first_name);
         }
 
         $q = $this->_getQuery();
