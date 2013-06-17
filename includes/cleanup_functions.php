@@ -2470,7 +2470,7 @@ function projects_list_data($user_id = false) {
 	$q->addTable('projects', 'pr');
 	$q->addQuery('pr.*, project_scheduled_hours as project_duration,
         company_id, company_name, project_last_task as critical_task,
-        tp.task_log_problem, user_username, task_log_problem, u.user_id');
+        tp.task_log_problem, u.user_username, task_log_problem, u.user_id');
 
 	$fields = w2p_Core_Module::getSettings('projects', 'index_list');
 	unset($fields['department_list']);  // added as an alias below
@@ -2481,6 +2481,11 @@ function projects_list_data($user_id = false) {
 	$q->addJoin('users', 'u', 'pr.project_owner = u.user_id');
 	$q->addJoin('contacts', 'ct', 'ct.contact_id = u.user_contact');
 	$q->addJoin('tasks_problems', 'tp', 'pr.project_id = tp.task_project');
+	if ($user_id) {
+		$q->leftJoin('project_contacts','pc','pc.project_id=pr.project_id');
+		$q->leftJoin('users','pcu','pc.contact_id=pcu.user_contact');
+//		$q->leftJoin('contacts','pcc','pcc.contact_id=pc.contact_id');
+	}
 	if ($addProjectsWithAssignedTasks) {
 		$q->addJoin('tasks_users', 'tu', 'pr.project_id = tu.task_project');
 	}
@@ -2494,9 +2499,9 @@ function projects_list_data($user_id = false) {
 		$q->addWhere('project_departments.department_id in ( ' . implode(',', $dept_ids) . ' )');
 	}
 	if ($user_id && $addProjectsWithAssignedTasks) {
-		$q->addWhere('(tu.user_id = ' . (int)$user_id . ' OR pr.project_owner = ' . (int)$user_id . ' )');
+		$q->addWhere('(tu.user_id = ' . (int)$user_id . ' OR pr.project_owner = ' . (int)$user_id . ' OR pcu.user_id= ' . (int)$user_id . ')');
 	} elseif ($user_id) {
-		$q->addWhere('pr.project_owner = ' . (int)$user_id);
+		$q->addWhere('(pr.project_owner = ' . (int)$user_id . ' OR pcu.user_id= ' . (int)$user_id . ')');
 	}
 	if ($owner > 0) {
 		$q->addWhere('pr.project_owner = ' . (int)$owner);
