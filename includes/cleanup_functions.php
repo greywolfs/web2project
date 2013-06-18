@@ -3019,6 +3019,8 @@ function projectSelectWithOptGroup($user_id, $select_name, $select_attribs, $sel
 	$proj = new CProject();
 	$proj->setAllowedSQL($user_id, $q, null, 'pr');
 	$q->addOrder('co.company_name, project_name');
+	$q->leftJoin('project_contacts','pc','pc.project_id=pr.project_id');
+	$q->addWhere('(pr.project_owner=' . $AppUI->user_id . ' or pc.contact_id=' . $AppUI->user_id . ')');
 	$projects = $q->loadList();
 	$s = '<select name="' . $select_name . '" ' . $select_attribs . '>';
 	$s .= '<option value="0" ' . ($selected == 0 ? 'selected="selected"' : '') . ' >' . $AppUI->_('None') . '</option>';
