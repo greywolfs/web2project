@@ -420,7 +420,7 @@ function setDepartment(department_id_string){
                             <?php echo $AppUI->_('Import tasks from'); ?>:<br/>
                         </td>
                         <td colspan="3">
-                            <?php echo projectSelectWithOptGroup($AppUI->user_id, 'import_tasks_from', 'size="1" class="text"', false, $project_id); ?>
+                            <?php echo projectSelectWithOptGroup($AppUI->user_id, 'import_tasks_from', 'size="1" class="text"', false, $project_id, true); ?>
                         </td>
                     </tr>
                     <tr>
