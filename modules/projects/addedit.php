@@ -161,7 +161,7 @@ function popDepartment() {
         var f = document.editFrm;
 	var url = './index.php?m=public&a=selector&dialog=1&callback=setDepartment&table=departments&company_id='
             + f.project_company.options[f.project_company.selectedIndex].value;
-        window.open(url,'dept','left=50,top=50,height=250,width=400,resizable');
+        window.open(url,'dept','left=50,top=50,height=600,width=400,resizable');
 }
 
 function setDepartment(department_id_string){

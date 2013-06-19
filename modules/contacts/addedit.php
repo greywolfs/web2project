@@ -127,7 +127,7 @@ function submitIt() {
 
 function popDepartment() {
 	var f = document.changecontact;
-	window.open('./index.php?m=contacts&a=select_contact_company&dialog=1&table_name=departments&company_id='+f.contact_company.value+'&dept_id='+f.contact_department.value, 'company', 'left=50,top=50,height=320,width=400,resizable');
+	window.open('./index.php?m=contacts&a=select_contact_company&dialog=1&table_name=departments&company_id='+f.contact_company.value+'&dept_id='+f.contact_department.value, 'company', 'left=50,top=50,height=600,width=400,resizable');
 }
 
 function setDepartment( key ){
