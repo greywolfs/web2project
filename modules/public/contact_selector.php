@@ -86,7 +86,7 @@ if (strlen($selected_contacts_id) > 0 && !$show_all && !$company_id) {
 $q->addTable('contacts', 'a');
 $q->leftJoin('companies', 'b', 'company_id = contact_company');
 $q->leftJoin('departments', 'c', 'dept_id = contact_department');
-$q->addQuery('contact_id, contact_first_name, contact_last_name, contact_company, contact_department');
+$q->addQuery('contact_id, contact_first_name, contact_last_name, contact_display_name, contact_company, contact_department');
 $q->addQuery('company_name');
 $q->addQuery('dept_name');
 if (isset($where) && $where) { // Don't assume where is set. Change needed to fix Mantis Bug 0002056
@@ -150,7 +150,7 @@ $contacts = $q->loadHashList('contact_id');
 							}
 							$checked = in_array($contact_id, $contacts_id) ? 'checked="checked"' : '';
 							echo '<input type="checkbox" name="contact_id[]" id="contact_' . $contact_id . '" value="' . $contact_id . '" ' . $checked . ' />';
-							echo '<label for="contact_' . $contact_id . '">' . $contact_data['contact_first_name'] . ' ' . $contact_data['contact_last_name'] . '</label>';
+							echo '<label for="contact_' . $contact_id . '">' . $contact_data['contact_display_name'] . '</label>';
 							echo '<br />';
 						}
 					?>
