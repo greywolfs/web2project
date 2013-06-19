@@ -894,9 +894,9 @@ $(document).ready(function(){
 		var select_name=$(this).attr('filter_select');
 		all_filters[select_name][all_filters[select_name].length]=function(options){
 			var filtered_option=[];
-			var search_text=filter.val().toLowerCase();
+			var search_text=filter.val().toLowerCase().trim();
 			for (var i=0;i<options.length;i++){
-				if (options[i].innerText.toLowerCase().search(search_text)!=-1)
+				if (options[i].innerHTML.toLowerCase().search(search_text)!=-1)
 				{
 					filtered_option.push(options[i]);
 				}
@@ -918,7 +918,7 @@ $(document).ready(function(){
 	$('select.filter_select').change(function(){
 		filtered_data_in_select($(this).attr('filter_select'));
 	});
-	$('input.filter_select').keypress(function(){
+	$('input.filter_select').keyup(function(){
 		filtered_data_in_select($(this).attr('filter_select'));
 	});
 });
