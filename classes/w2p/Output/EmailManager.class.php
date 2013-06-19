@@ -49,6 +49,17 @@ class w2p_Output_EmailManager
         return $body;
     }
 
+	public function getEventRemind(CEvent $event){
+		$start_date = new w2p_Utilities_Date($event->event_start_date);
+		$end_date = new w2p_Utilities_Date($event->event_end_date);
+
+		return
+				$event->event_name. "\n\n" .
+        		$this->_AppUI->_('Starts') . ":\t" . $start_date->format('%e.%m.%Y %T') . " GMT/UTC\n" .
+        		$this->_AppUI->_('Ends') . ":\t" . $end_date->format('%e.%m.%Y %T') . " GMT/UTC\n \n".
+        		$event->event_description;
+	}
+
     public function getEventNotify(CEvent $event, $clash, $users)
     {
 

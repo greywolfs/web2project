@@ -644,4 +644,52 @@ class CEvent extends w2p_Core_BaseObject
 
         return $count;
     }
+
+	public function hook_cron(){
+		$q = $this->_query;
+		$q->addTable('events','e');
+		$q->addQuery('event_id');
+		$q->addWhere('event_remind>0');
+
+		$events=array();
+		$event_ids = array_keys($q->loadHashList());
+		$mail = new w2p_Utilities_Mail();
+		$emailManager = new w2p_Output_EmailManager($this->_AppUI);
+		foreach($event_ids as $event_id){
+			$event= new CEvent();
+			$event->loadFull($event_id);
+			$mail->Subject($this->_AppUI->_('Event reminder') . ': ' . $event->event_name, $this->_locale_char_set);
+
+			$body = $emailManager->getEventRemind($event);
+
+			$mail->Body($body, $this->_locale_char_set);
+
+			$assignee_list=array_merge(array($event->event_owner),array_keys($event->getAssigned()));
+			if (!empty($assignee_list)){
+				$q = $this->_getQuery();
+				$q->addTable('users', 'u');
+				$q->addTable('contacts', 'con');
+				$q->addQuery('user_id, contact_email');
+				$q->addQuery('contact_display_name, contact_display_name as contact_name');
+				$q->addWhere('u.user_contact = con.contact_id');
+				$q->addWhere('user_id in (' . implode(',', $assignee_list) . ')');
+
+				$users = $q->loadHashList();
+				$readyEvent=array();
+				foreach ($users as $user_id=>$user_email) {
+					$mail->To($user_email, true);
+					if ($mail->Send()){
+						$readyEvent[]=$event->event_id;
+					}
+				}
+			}
+		}
+		if (!empty($readyEvent)){
+			$q->clear();
+			$q->addTable('events');
+			$q->addUpdate('event_remind','0');
+			$q->addWhere("event_id in (".implode(', ',$readyEvent).")");
+			$q->exec();
+		}
+	}
 }
