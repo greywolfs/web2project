@@ -211,6 +211,9 @@ input[type="checkbox"] {
     text-align: center;
     white-space:nowrap;
 }
+.list td._name{
+	white-space:normal;
+}
 table.smartsearch td {
     text-align: left;
 }
@@ -251,10 +254,10 @@ table.list {
 table.list tr:hover td {
     background-color: #ffffcc;
     color: #000;
-    font-style: italic;
+    /*font-style: italic;*/
 }
 table.list tr:hover td._name {
-    font-weight: bold;
+    /*font-weight: bold;*/
 }
 
 .list ._description {
