@@ -412,20 +412,70 @@ function delIt() {
 
 <?php
 function is_tasks_member(){
-	global $users, $task_contacts, $AppUI, $obj;
-	if ($AppUI->user_is_admin)
-		return true;
+	global $users, $AppUI, $obj, $is_tasks_member;
+	if ($is_tasks_member!=null){
+		return $is_tasks_member;
+	}else{
+		$is_tasks_member=false;
+	}
+	if ($AppUI->user_is_admin){
+		$is_tasks_member=true;
+		return $is_tasks_member;
+	}
 	foreach ($users as $user){
-		if ($AppUI->user_id==$user['user_id'])
-			return true;
+		if ($AppUI->user_id==$user['user_id']){
+			$is_tasks_member=true;
+			return $is_tasks_member;
+		}
 	}
-	if ($AppUI->user_id==$obj->task_owner)
-		return true;
+	if ($AppUI->user_id==$obj->task_owner){
+		$is_tasks_member=true;
+		return $is_tasks_member;
+	}
+	$task_contacts = $obj->getContacts(null,$obj->task_id);
 	foreach ($task_contacts as $contact){
-		if ($AppUI->user_id==$contact['contact_id'])
-			return true;
+		if ($AppUI->user_id==$contact['contact_id']){
+			$is_tasks_member=true;
+			return $is_tasks_member;
+		}
 	}
-	return false;
+	$project = new CProject();
+	$project->project_id = $obj->task_project;
+	$project_contacts = $project->getContactList();
+	foreach ($project_contacts as $contact){
+		if ($AppUI->user_id==$contact['contact_id']){
+			$is_tasks_member=true;
+			return $is_tasks_member;
+		}
+	}
+	$q= new w2p_Database_Query();
+	$q->addTable('task_departments');
+	$q->addQuery('department_id');
+	$q->addWhere('department_id=' . $AppUI->user_department);
+	$q->addWhere('task_id=' . $obj->task_id);
+	if ($q->loadHash()){
+		$is_tasks_member=true;
+		return $is_tasks_member;
+	}
+	$q->clear();
+	$q->addTable('projects');
+	$q->addQuery('project_department');
+	$q->addWhere('project_department=' . $AppUI->user_department);
+	$q->addWhere('project_id=' . $obj->task_project);
+	if ($q->loadHash()){
+		$is_tasks_member=true;
+		return $is_tasks_member;
+	}
+	$q->clear();
+	$q->addTable('project_departments');
+	$q->addQuery('project_id');
+	$q->addWhere('department_id=' . $AppUI->user_department);
+	$q->addWhere('project_id=' . $obj->task_project);
+	if ($q->loadHash()){
+		$is_tasks_member=true;
+		return $is_tasks_member;
+	}
+	return $is_tasks_member;
 }
 $query_string = '?m=tasks&a=view&task_id=' . $task_id;
 $tabBox = new CTabBox('?m=tasks&a=view&task_id=' . $task_id, '', $tab);

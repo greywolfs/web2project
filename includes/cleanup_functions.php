@@ -2485,6 +2485,24 @@ function projects_list_data($user_id = false) {
 		$q->leftJoin('project_contacts','pc','pc.project_id=pr.project_id');
 		$q->leftJoin('users','pcu','pc.contact_id=pcu.user_contact');
 //		$q->leftJoin('contacts','pcc','pcc.contact_id=pc.contact_id');
+		$q1 = new w2p_Database_Query;
+		$q1->addTable('users');
+		$q1->addQuery('user_department,contact_department');
+		$q1->leftJoin('contacts','c','contact_id=user_contact');
+		$q1->addWhere('user_id='.$user_id);
+		$hash=$q1->loadHash();
+		$user_departments=array();
+		if (!empty($hash)){
+			if ($hash['user_department']){
+				$user_departments[]=$hash['user_department'];
+			}
+			if ($hash['contact_department']){
+				$user_departments[]=$hash['contact_department'];
+			}
+		}
+		if (!empty($user_departments)){
+			$q->leftJoin('project_departments','pd','pd.project_id=pr.project_id');
+		}
 	}
 	if ($addProjectsWithAssignedTasks) {
 		$q->addJoin('tasks_users', 'tu', 'pr.project_id = tu.task_project');
@@ -2499,9 +2517,9 @@ function projects_list_data($user_id = false) {
 		$q->addWhere('project_departments.department_id in ( ' . implode(',', $dept_ids) . ' )');
 	}
 	if ($user_id && $addProjectsWithAssignedTasks) {
-		$q->addWhere('(tu.user_id = ' . (int)$user_id . ' OR pr.project_owner = ' . (int)$user_id . ' OR pcu.user_id= ' . (int)$user_id . ')');
+		$q->addWhere('(tu.user_id = ' . (int)$user_id . ' OR pr.project_owner = ' . (int)$user_id . ' OR pcu.user_id= ' . (int)$user_id . (!empty($user_departments)?' OR pr.project_department in ('.implode(',',$user_departments).') OR pd.department_id in ('.implode(',',$user_departments).')':'') . ')');
 	} elseif ($user_id) {
-		$q->addWhere('(pr.project_owner = ' . (int)$user_id . ' OR pcu.user_id= ' . (int)$user_id . ')');
+		$q->addWhere('(pr.project_owner = ' . (int)$user_id . ' OR pcu.user_id= ' . (int)$user_id . (!empty($user_departments)?' OR pr.project_department in ('.implode(',',$user_departments).') OR pd.department_id in ('.implode(',',$user_departments).')':'') . ')');
 	}
 	if ($owner > 0) {
 		$q->addWhere('pr.project_owner = ' . (int)$owner);
