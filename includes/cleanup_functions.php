@@ -3029,6 +3029,21 @@ function tree_recurse($id, $indent, $list, $children) {
 function projectSelectWithOptGroup($user_id, $select_name, $select_attribs, $selected, $excludeProjWithId = null, $withTemplate=false) {
 	global $AppUI;
 	$q = new w2p_Database_Query();
+	$q->addTable('users');
+	$q->addQuery('user_department,contact_department');
+	$q->leftJoin('contacts','c','contact_id=user_contact');
+	$q->addWhere('user_id='.$user_id);
+	$hash=$q->loadHash();
+	$user_departments=array();
+	if (!empty($hash)){
+		if ($hash['user_department']){
+			$user_departments[]=$hash['user_department'];
+		}
+		if ($hash['contact_department']){
+			$user_departments[]=$hash['contact_department'];
+		}
+    }
+	$q->clear();
 	$q->addTable('projects', 'pr');
 	$q->addQuery('DISTINCT pr.project_id, co.company_name, project_name');
 	if (!empty($excludeProjWithId)) {
@@ -3038,7 +3053,10 @@ function projectSelectWithOptGroup($user_id, $select_name, $select_attribs, $sel
 	$proj->setAllowedSQL($user_id, $q, null, 'pr');
 	$q->addOrder('co.company_name, project_name');
 	$q->leftJoin('project_contacts','pc','pc.project_id=pr.project_id');
-	$q->addWhere('(pr.project_owner=' . $AppUI->user_id . ' or pc.contact_id=' . $AppUI->user_id . ($withTemplate?' or pr.project_status=6':'') . ')');
+	if (!empty($user_departments)){
+		$q->leftJoin('project_departments','pd','pd.project_id=pr.project_id');
+	}
+	$q->addWhere('(pr.project_owner=' . $AppUI->user_id . ' or pc.contact_id=' . $AppUI->user_id . ($withTemplate?' or pr.project_status=6':'') . (!empty($user_departments)?' OR pr.project_department in ('.implode(',',$user_departments).') OR pd.department_id in ('.implode(',',$user_departments).')':'') . ')');
 	$projects = $q->loadList();
 	$s = '<select name="' . $select_name . '" ' . $select_attribs . '>';
 	$s .= '<option value="0" ' . ($selected == 0 ? 'selected="selected"' : '') . ' >' . $AppUI->_('None') . '</option>';
