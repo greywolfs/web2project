@@ -921,4 +921,14 @@ $(document).ready(function(){
 	$('input.filter_select').keyup(function(){
 		filtered_data_in_select($(this).attr('filter_select'));
 	});
+	$('input[type="checkbox"].check_all').change(function(){
+		var check_class=$(this).attr('check_class');
+		if (check_class){
+			if ($(this).prop("checked")){
+				$('.'+check_class).attr("checked","checked");
+			}else{
+				$('.'+check_class).removeAttr('checked');
+			}
+		}
+	})
 });
