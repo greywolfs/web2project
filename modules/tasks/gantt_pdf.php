@@ -463,77 +463,83 @@ foreach ($gtask_sliced as $gts) {
     $outpfiles[] = $filename;
     $page++;
 }
-
-//Override of some variables, not very tidy but necessary when importing code from other sources...
-$skip_page = 0;
-$do_report = 1;
-$show_task = 1;
-$show_assignee = 1;
-$show_gantt = 1;
-$show_gantt_taskdetails = ($showTaskNameOnly == '1') ? 0 : 1;
-$ganttfile = $outpfiles;
-
-// Initialize PDF document 
-$font_dir = W2P_BASE_DIR . '/lib/ezpdf/fonts';
 $temp_dir = W2P_BASE_DIR . '/files/temp';
-$base_url = w2PgetConfig('base_url');
 
-$pdf = new Cezpdf($paper='A4',$orientation='landscape');
-$pdf->ezSetCmMargins( 2, 1.5, 1.4, 1.4 ); //(top, bottom, left, right)
-/*
-* 		Define page header to be displayed on top of each page
-*/
-$pdf->saveState();
-if ( $skip_page ) $pdf->ezNewPage();
-$skip_page++;
-$page_header = $pdf->openObject();
-$pdf->selectFont( "$font_dir/Helvetica-Bold.afm" );
-$ypos= $pdf->ez['pageHeight'] - ( 30 + $pdf->getFontHeight(12) );
+// Include the main TCPDF library (search for installation path).
+require_once('lib/tcpdf/tcpdf.php');
+
+// create new PDF document
+$pdf = new TCPDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+// set document information
+$pdf->SetCreator(PDF_CREATOR);
+
+// set default header data
+$pdf->setFooterData(array(0,64,0), array(0,64,128));
+
+// set header and footer fonts
+$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+
+// set default monospaced font
+$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+
+// set margins
+$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+// set auto page breaks
+$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+// set image scale factor
+$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
+// set some language-dependent strings (optional)
+if (@file_exists(dirname(__FILE__).'lib/tcpdf/examples/lang/rus.php')) {
+	require_once(dirname(__FILE__).'lib/tcpdf/examples/lang/rus.php');
+	$pdf->setLanguageArray($l);
+}
+
+// ---------------------------------------------------------
+
+// set default font subsetting mode
+$pdf->setFontSubsetting(true);
+
+// Set font
+// dejavusans is a UTF-8 Unicode font, if you only need to
+// print standard ASCII chars, you can use core fonts like
+// helvetica or times to reduce file size.
+$pdf->SetFont('dejavusans', '', 14, '', true);
+
+// Add a page
+// This method has several options, check the source code documentation for more information.
+$pdf->AddPage();
+
+// set text shadow effect
+$pdf->setTextShadow(array('enabled'=>true, 'depth_w'=>0.2, 'depth_h'=>0.2, 'color'=>array(196,196,196), 'opacity'=>1, 'blend_mode'=>'Normal'));
+
+// Set some content to print
 $doc_title = strEzPdf( $projects[$project_id]['project_name'], UI_OUTPUT_RAW);
-$pwidth=$pdf->ez['pageWidth'];
-$xpos= round( ($pwidth - $pdf->getTextWidth( 12, $doc_title ))/2, 2 );
-$pdf->addText( $xpos, $ypos, 12, $doc_title) ;
-$pdf->selectFont( "$font_dir/Helvetica.afm" );
-$date = new w2p_Utilities_Date();
-$xpos = round( $pwidth - $pdf->getTextWidth( 10, $date->format($df)) - $pdf->ez['rightMargin'] , 2);
-$doc_date = strEzPdf($date->format( $df ));
-$pdf->addText( $xpos, $ypos, 10, $doc_date );
-$pdf->closeObject($page_header);
-$pdf->addObject($page_header, 'all');
-$gpdfkey = W2P_BASE_DIR. '/modules/tasks/images/ganttpdf_key.png';
-$gpdfkeyNM = W2P_BASE_DIR. '/modules/tasks/images/ganttpdf_keyNM.png';
-
-$pdf->ezStartPageNumbers( 802 , 30 , 10 ,'left','Page {PAGENUM} of {TOTALPAGENUM}') ;
-for ($i=0; $i < count($ganttfile); $i++) {
-    $gf = $ganttfile[$i];
-    $pdf->ezColumnsStart(array('num' =>1, 'gap' =>0));
-    $pdf->ezImage( $gf, 0, 765, 'width', 'left'); // No pad, width = 800px, resize = 'none' (will go to next page if image height > remaining page space)
-    if ($showNoMilestones == '1') {
-        $pdf->ezImage( $gpdfkeyNM, 0, 765, 'width', 'left');
-    } else {
-        $pdf->ezImage( $gpdfkey, 0, 765, 'width', 'left');
-    }
-    $pdf->ezColumnsStop();
+$html = '
+	<div width="100%" style="text-align: center">'.$doc_title.'</div>
+';
+for ($i=0; $i < count($outpfiles); $i++) {
+	$pdf->Image($outpfiles[$i],'',35,265);
 }
-// End of project display
-// Create document body and pdf temp file
-$pdf->stopObject($page_header);
+// Print text using writeHTMLCell()
+$pdf->writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
+
+// ---------------------------------------------------------
+
+// Close and output PDF document
+// This method has several options, check the source code documentation for more information.
 $gpdffile = $temp_dir . '/GanttChart_'.md5(time()).'.pdf';
-if ($fp = fopen($gpdffile, 'wb')) {
-    fwrite($fp, $pdf->ezOutput());
-    fclose($fp);
-} else {
-    //TODO: create error handler for permission problems
-    echo "Could not open file to save PDF.  ";
-    if (!is_writable( $temp_dir ))
-    echo "The files/temp directory is not writable.  Check your file system permissions.";
-}
+$pdf->Output($gpdffile, 'F');
 
-$_POST['printpdf'] = '0';
-$printpdf = '0';
-$_POST['printpdfhr']= 0;
-$printpdfhr = 0;
-
+//============================================================+
+// END OF FILE
+//============================================================+
 // check that file exists and is readable
 if (file_exists($gpdffile) && is_readable($gpdffile)) {
     // get the file size and send the http headers
