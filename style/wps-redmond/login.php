@@ -68,7 +68,7 @@ $theme = new style_wpsredmond($AppUI);
                 <tr>
                     <td style="padding:6px" colspan="2"><a href="javascript: void(0);" onclick="f=document.loginform;f.lostpass.value=1;f.submit();"><?php echo $AppUI->_('forgotPassword'); ?></a></td>
                 </tr>
-                <?php if (w2PgetConfig('activate_external_user_creation') == 'true') { ?>
+                <?php if (w2PgetConfig('activate_external_user_creation') == 'true' && false) { ?>
                     <tr>
                          <td style="padding:6px" colspan="2"><a href="javascript: void(0);" onclick="javascript:window.location='./newuser.php'"><?php echo $AppUI->_('newAccountSignup'); ?></a></td>
                     </tr>
