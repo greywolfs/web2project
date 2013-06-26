@@ -202,7 +202,7 @@ function popContacts() {
         <tr valign="top">
             <td>
                 <?php echo $AppUI->_('Task Name'); ?> *
-                <br /><input type="text" class="text" name="task_name" value="<?php echo htmlspecialchars($task->task_name, ENT_QUOTES); ?>" size="40" maxlength="255" />
+                <br /><input type="text" class="text" name="task_name" value="<?php echo htmlspecialchars($task->task_name, ENT_QUOTES); ?>" maxlength="255" style="width:100%"/>
             </td>
             <td>
                 <table cellspacing="0" cellpadding="2" border="0" width="100%" class="well">
