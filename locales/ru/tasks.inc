@@ -44,6 +44,7 @@
 'Begin new tasks if dependencies are finished before expected'=>'',
 'Calculate'=>'Расчитать',
 'Calendar'=>'Календарь',
+'calendar days'=>'календарных дней',
 'Change Priority of selected Tasks'=>'Изменить приоритет',
 'Change Task Project'=>'Перенести в другой проект',
 'Change User specific Task Priority of selected Tasks'=>'',

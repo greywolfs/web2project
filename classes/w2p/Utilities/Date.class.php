@@ -462,10 +462,15 @@ class w2p_Utilities_Date extends Date {
 		$work_hours     = (int) w2PgetConfig('daily_working_hours');
         $min_increment  = (int) w2PgetConfig('cal_day_increment');
 
+		$only_work_days=true;
+		if ($durationType == 25){
+			$durationType =24;
+			$only_work_days=false;
+		}
 		$duration_in_minutes = ($durationType == 24) ? $duration*$work_hours*60 : $duration*60;
 
 		// Jump to the first working day
-		while(!$finishDate->isWorkingDay()) {
+		while($only_work_days && !$finishDate->isWorkingDay()) {
 			$finishDate->addDays(1);
 		}
 
@@ -492,7 +497,7 @@ class w2p_Utilities_Date extends Date {
 			$finishDate->setTime($day_start_hour);
 			
 			// Jump all non-working days
-			while(!$finishDate->isWorkingDay()) {
+			while($only_work_days && !$finishDate->isWorkingDay()) {
 				$finishDate->addDays(1);
 			}
 			
