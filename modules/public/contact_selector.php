@@ -140,12 +140,12 @@ $contacts = $q->loadHashList('contact_id');
 								$contact_company = $contact_data['company_name'];
 							}
 							if ($contact_company && $contact_company != $actual_company) {
-								echo '<h4><input type="checkbox" class="check_all" check_class="company_'.$contact_data['contact_company'].'"/>' . $contact_company . '</h4>';
+								echo '<label><h4><input type="checkbox" class="check_all" check_class="company_'.$contact_data['contact_company'].'"/>' . $contact_company . '</h4><label>';
 								$actual_company = $contact_company;
 							}
 							$contact_department = $contact_data['dept_name'] ? $contact_data['dept_name'] : $contact_data['contact_department'];
 							if ($contact_department && $contact_department != $actual_department) {
-								echo '<h5>&nbsp&nbsp<input type="checkbox" class="check_all company_'.$contact_data['contact_company'].'" check_class="department_'.$contact_data['contact_department'].'"/>' . $contact_department . '</h5>';
+								echo '<label><h5>&nbsp&nbsp<input type="checkbox" class="check_all company_'.$contact_data['contact_company'].'" check_class="department_'.$contact_data['contact_department'].'"/>' . $contact_department . '</h5></label>';
 								$actual_department = $contact_department;
 							}
 							$checked = in_array($contact_id, $contacts_id) ? 'checked="checked"' : '';
