@@ -336,7 +336,7 @@ class w2p_Utilities_Date extends Date {
      * @param	obj	DateObject	may be viewed as end date
      * @return	float				working duration in hours
 	 */
-	public function calcDuration($endDate) {
+	public function calcDuration($endDate,$calendars_day=false) {
 
 		// since one will alter the date ($this) one better copies it to a new instance
 		$startDate = new w2p_Utilities_Date();
@@ -361,7 +361,7 @@ class w2p_Utilities_Date extends Date {
 
 		$duration = 0.0;
 
-		if($startDate->isWorkingDay()) {
+		if($calendars_day || $startDate->isWorkingDay()) {
 			// Start date time in minutes
 			$dateDiff = $startDate->diff($endDate);
 			$start_date_minutes = $startDate->getHour()*60 + $startDate->getMinute();
@@ -385,7 +385,7 @@ class w2p_Utilities_Date extends Date {
 		while($startDate->before($endDate)) {
 
 			// Just do things when the day is a working day
-			if($startDate->isWorkingDay()) {
+			if($calendars_day || $startDate->isWorkingDay()) {
 				// Check if we're at the last day. If that's the case, just calculate hour differences
 				if($startDate->isSameDay($endDate)) {
 					$duration += min($endDate->getHour()*60 + $endDate->getMinute() - $day_start_hour*60, $work_hours*60);

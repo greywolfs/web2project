@@ -48,9 +48,16 @@ function calcDuration($start_date, $start_hour, $start_minute,
     $endDate = new w2p_Utilities_Date($year.'-'.$month.'-'.$day);
     $endDate->setTime($end_hour, $end_minute);
 
-    $duration = $startDate->calcDuration($endDate);
+	$duration_type=(int)$duration_type;
+	$calendars_day=false;
+	if ($duration_type==25){
+		$duration_type=24;
+		$calendars_day=true;
+	}
 
-    if(intval($duration_type) == 24) {
+    $duration = $startDate->calcDuration($endDate,$calendars_day);
+
+    if($duration_type == 24 ) {
         $workHours = intval(w2PgetConfig('daily_working_hours'));
         $duration = $duration / $workHours;
     }

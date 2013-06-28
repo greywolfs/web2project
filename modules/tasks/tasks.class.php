@@ -773,6 +773,19 @@ class CTask extends w2p_Core_BaseObject
         $this->w2PTrimAll();
 
         $q = $this->_getQuery();
+
+		$work_hours     = (int) w2PgetConfig('daily_working_hours');
+		$divisor=1;
+		if ($this->task_duration_type!=1){
+			$this->task_duration_type=24;
+			$divisor=$work_hours;
+		}
+		$start_date=new w2p_Utilities_Date($this->task_start_date,'europe/london');
+		$start_date->convertTZ($this->_AppUI->user_prefs['TIMEZONE']);
+		$end_date=new w2p_Utilities_Date($this->task_end_date,'europe/london');
+		$end_date->convertTZ($this->_AppUI->user_prefs['TIMEZONE']);
+		$this->task_duration=$start_date->calcDuration($end_date)/$divisor;
+
         $this->task_updated = $q->dbfnNowWithTZ();
         $this->task_target_budget = filterCurrency($this->task_target_budget);
         $this->task_owner = ($this->task_owner) ? $this->task_owner : $this->_AppUI->user_id;
@@ -1072,7 +1085,7 @@ class CTask extends w2p_Core_BaseObject
         foreach($dependent_tasks as $_task_id => $_task_data) {
             $task_start_int = strtotime($_task_data['task_start_date']);
 
-            if ($task_start_int >= $task_end_int) {
+            if ($task_start_int == $task_end_int) {
                 /**
                  * Remember, this continue just means 'skip this iteration and
                  *   go to the next one.' In this case, we're skipping the

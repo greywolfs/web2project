@@ -211,14 +211,14 @@ class CTask_Log extends w2p_Core_BaseObject
 
     protected function hook_postStore()
     {
-        $this->updateTaskSummary(null, $this->task_log_task);
+        $this->updateTaskSummary($this->task_log_task);
 
         parent::hook_postStore();
     }
 
     protected function hook_postDelete()
     {
-        $this->updateTaskSummary(null, $this->_task_id);
+        $this->updateTaskSummary($this->_task_id);
 
         parent::hook_postStore();
     }
@@ -231,7 +231,7 @@ class CTask_Log extends w2p_Core_BaseObject
 	 *
 	 * @access protected
 	 */
-	protected function updateTaskSummary($notUsed = null, $task_id)
+	protected function updateTaskSummary($task_id)
 	{
         $q = $this->_getQuery();
 
@@ -251,6 +251,12 @@ class CTask_Log extends w2p_Core_BaseObject
             $task = new CTask();
             $task->overrideDatabase($this->_query);
             $task->load($task_id);
+
+			$task_end_date_time=new w2p_Utilities_Date($task->task_end_date,'europe/london');
+			$task_log_task_end_date=new w2p_Utilities_Date($this->task_log_task_end_date,'europe/london');
+			$task_log_task_end_date->setTime($task_end_date_time->getHour(),$task_end_date_time->getMinute(),$task_end_date_time->getSecond());
+			$this->task_log_task_end_date=$task_log_task_end_date->format('%Y-%m-%e %T');
+
             $diff = strtotime($this->task_log_task_end_date) - strtotime($task->task_end_date);
             $task_end_date = (0 == $diff) ? $task->task_end_date : $this->task_log_task_end_date;
 
