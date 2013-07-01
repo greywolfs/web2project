@@ -260,6 +260,12 @@ class CTask_Log extends w2p_Core_BaseObject
             $diff = strtotime($this->task_log_task_end_date) - strtotime($task->task_end_date);
             $task_end_date = (0 == $diff) ? $task->task_end_date : $this->task_log_task_end_date;
 
+			$now=new w2p_Utilities_Date();
+			$now->convertTZ('europe/london');
+			if ($now<$task_log_task_end_date){
+				$task_end_date=$now->format('%Y-%m-%e %T');
+			}
+
             /*
              * We're using a database update here instead of store() because a
              *   bunch of other things happen when you call store().. like the
