@@ -780,9 +780,9 @@ class CTask extends w2p_Core_BaseObject
 			$this->task_duration_type=24;
 			$divisor=$work_hours;
 		}
-		$start_date=new w2p_Utilities_Date($this->task_start_date,'europe/london');
+		$start_date=new w2p_Utilities_Date($this->task_start_date,'Europe/London');
 		$start_date->convertTZ($this->_AppUI->user_prefs['TIMEZONE']);
-		$end_date=new w2p_Utilities_Date($this->task_end_date,'europe/london');
+		$end_date=new w2p_Utilities_Date($this->task_end_date,'Europe/London');
 		$end_date->convertTZ($this->_AppUI->user_prefs['TIMEZONE']);
 		$this->task_duration=$start_date->calcDuration($end_date)/$divisor;
 
