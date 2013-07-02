@@ -261,7 +261,8 @@ class w2p_Utilities_Date extends Date {
 				$dwh = (int) w2PgetConfig('daily_working_hours');
 
 				// move to the next working day if the first day is a non-working day
-				($sgn > 0) ? $this->next_working_day() : $this->prev_working_day();
+				if (!$this->isWorkingDay())
+					($sgn > 0) ? $this->next_working_day() : $this->prev_working_day();
 
 				// calculate the hours spent on the first day
 				$firstDay = ($sgn > 0) ? min($cal_day_end - $this->hour, $dwh) : min($this->hour - $cal_day_start, $dwh);
@@ -290,7 +291,8 @@ class w2p_Utilities_Date extends Date {
 				$this->addDays(1 * $sgn);
 
 				// make sure that we didn't move to a non-working day
-				($sgn > 0) ? $this->next_working_day() : $this->prev_working_day();
+				if (!$this->isWorkingDay())
+					($sgn > 0) ? $this->next_working_day() : $this->prev_working_day();
 
 				// end of proceeding the first day
 
