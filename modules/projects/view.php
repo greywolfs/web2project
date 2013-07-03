@@ -52,7 +52,14 @@ $criticalTasks = ($project_id > 0) ? $project->getCriticalTasks($project_id) : n
 $end_date = intval($project->project_end_date) ? new w2p_Utilities_Date($project->project_end_date) : null;
 $actual_end_date = null;
 if (isset($criticalTasks)) {
-    $actual_end_date = intval($criticalTasks[0]['task_end_date']) ? new w2p_Utilities_Date($criticalTasks[0]['task_end_date']) : null;
+    $actual_end_date = null;
+	if (intval($criticalTasks[0]['task_end_date'])){
+		$actual_end_date = new w2p_Utilities_Date($criticalTasks[0]['task_end_date']);
+		$task = new CTask();
+		$count_tasks = $task->getTaskCount($project_id);
+		CProject::updateTaskCache(
+			$project_id, $criticalTasks[0]['task_id'], $criticalTasks[0]['task_end_date'], $count_tasks);
+	}
 }
 $style = (($actual_end_date > $end_date) && !empty($end_date)) ? 'style="color:red; font-weight:bold"' : '';
 
