@@ -59,6 +59,8 @@
 'Date',
 'Dates',
 'Dates and Targets',
+'Delayed tasks',
+'Delayed projects',
 'Delete',
 'Departments',
 'Dependencies',

@@ -197,6 +197,16 @@ $f = (($f) ? $f : '');
 switch ($f) {
 	case 'all':
 		break;
+	case 'delayed_tasks':{
+		$q->addWhere('task_end_date<\''.date('Y-m-d H:i:s').'\'');
+		$q->addWhere('task_percent_complete < 100');
+		break;
+	}
+	case 'delayed_projects':{
+		$q->addWhere('project_end_date<project_actual_end_date');
+		$q->addWhere('project_percent_complete < 100');
+		break;
+	}
 	case 'myfinished7days':
 		$q->addWhere('ut.user_id = ' . (int)$user_id);
 	case 'allfinished7days': // patch 2.12.04 tasks finished in the last 7 days

@@ -62,6 +62,8 @@
 'Date'=>'Дата',
 'Dates'=>'Даты',
 'Dates and Targets'=>'Даты и цели',
+'Delayed tasks'=>'Просроченные задачи',
+'Delayed projects'=>'Просроченные проекты',
 'Delete'=>'Удалить',
 'Departments'=>'Департаменты',
 'Dependencies'=>'Зависимости',

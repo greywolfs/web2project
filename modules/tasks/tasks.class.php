@@ -7,9 +7,9 @@ $percent = array(0 => '0', 5 => '5', 10 => '10', 15 => '15', 20 => '20', 25 => '
 
 // patch 2.12.04 add all finished last 7 days, my finished last 7 days
 if ($AppUI->user_is_admin){
-	$filters = array('my' => 'My Tasks', 'myunfinished' => 'My Unfinished Tasks', 'allunfinished' => 'All Unfinished Tasks', 'myproj' => 'My Projects', 'mycomp' => 'All Tasks for my Company', 'unassigned' => 'All Tasks (unassigned)', 'taskowned' => 'All Tasks That I Am Owner', 'taskcreated' => 'All Tasks I Have Created', 'all' => 'All Tasks', 'allfinished7days' => 'All Tasks Finished Last 7 Days', 'myfinished7days' => 'My Tasks Finished Last 7 Days');
+	$filters = array('my' => 'My Tasks', 'myunfinished' => 'My Unfinished Tasks', 'allunfinished' => 'All Unfinished Tasks', 'myproj' => 'My Projects', 'mycomp' => 'All Tasks for my Company', 'unassigned' => 'All Tasks (unassigned)', 'taskowned' => 'All Tasks That I Am Owner', 'taskcreated' => 'All Tasks I Have Created', 'all' => 'All Tasks', 'allfinished7days' => 'All Tasks Finished Last 7 Days', 'myfinished7days' => 'My Tasks Finished Last 7 Days', 'delayed_tasks'=>'Delayed tasks','delayed_projects'=>'Delayed projects');
 }else{
-	$filters = array('my' => 'My Tasks', 'myunfinished' => 'My Unfinished Tasks', 'myproj' => 'My Projects', 'taskowned' => 'All Tasks That I Am Owner', 'taskcreated' => 'All Tasks I Have Created', 'myfinished7days' => 'My Tasks Finished Last 7 Days');
+	$filters = array('my' => 'My Tasks', 'myunfinished' => 'My Unfinished Tasks', 'myproj' => 'My Projects', 'taskowned' => 'All Tasks That I Am Owner', 'taskcreated' => 'All Tasks I Have Created', 'myfinished7days' => 'My Tasks Finished Last 7 Days', 'delayed_tasks'=>'Delayed tasks','delayed_projects'=>'Delayed projects');
 }
 
 $status = w2PgetSysVal('TaskStatus');
