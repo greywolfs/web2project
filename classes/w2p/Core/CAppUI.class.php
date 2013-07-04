@@ -933,13 +933,19 @@ class w2p_Core_CAppUI
         $this->setUserLocale();
         $this->checkStyle();
 
+		$perms = &$this->acl();
+		$roles_names=array();
+		foreach ($perms->getUserRoles($user_id) as $role){
+			$roles_names[]=$role['value'];
+		}
+
         // Let's see if this user has admin privileges
-        if (canView('admin')) {
+        if (in_array('admin',$roles_names) || canView('admin')) {
             $this->user_is_admin = 1;
         }
 
-		// Let's see if this user has admin privileges
-		if (canView('controller')) {
+		// Let's see if this user has controller privileges
+		if (in_array('controller',$roles_names)) {
 			$this->user_is_controller = 1;
 		}
         return true;
