@@ -1371,7 +1371,7 @@ function showRoleRow($role = null) {
 		if ($canEdit) {
 			$s .= '<a href="?m=system&u=roles&role_id=' . $id . '">' . w2PshowImage('icons/stock_edit-16.png') . '</a><a href="?m=system&u=roles&a=viewrole&role_id=' . $id . '" title="">' . w2PshowImage('obj/lock.gif') . '</a>';
 		}
-		if ($canDelete && strpos($name, 'admin') === false) {
+		if ($canDelete && strpos($name, 'admin') === false && strpos($name, 'controller') === false) {
 			$s .= '<a href=\'javascript:delIt(' . $id . ')\'>' . w2PshowImage('icons/stock_delete-16.png') . '</a>';
 		}
 		$s .= '</td><td valign="top">' . $name . '</td><td valign="top">' . $AppUI->_($description) . '</td>';

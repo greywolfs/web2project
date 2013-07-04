@@ -108,6 +108,7 @@ class w2p_Core_CAppUI
     /**
       @var integer */
     public $user_is_admin = null;
+	public $user_is_controller = null;
     public $long_date_format = null;
     protected $objStore = null;
 
@@ -134,6 +135,7 @@ class w2p_Core_CAppUI
         $this->user_department = 0;
         $this->user_type = 0;
         $this->user_is_admin = 0;
+		$this->user_is_controller = 0;
 
         // cfg['locale_warn'] is the only cfgVariable stored in session data (for security reasons)
         // this guarants the functionality of this->setWarning
@@ -935,6 +937,11 @@ class w2p_Core_CAppUI
         if (canView('admin')) {
             $this->user_is_admin = 1;
         }
+
+		// Let's see if this user has admin privileges
+		if (canView('controller')) {
+			$this->user_is_controller = 1;
+		}
         return true;
     }
 

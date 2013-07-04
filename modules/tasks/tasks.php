@@ -174,6 +174,12 @@ $q->leftJoin('project_departments', 'project_departments', 'p.project_id = proje
 $q->leftJoin('departments', 'departments', 'departments.dept_id = project_departments.department_id OR dept_id IS NULL');
 $q->leftJoin('user_task_pin', 'pin', 'tasks.task_id = pin.task_id AND pin.user_id = ' . (int)$AppUI->user_id);
 
+if (!in_array($f,array('allunfinished','mycomp','unassigned','all','allfinished7days'))){
+	$q->leftJoin('task_contacts', 'tc', 'tasks.task_id=tc.task_id');
+	$q->leftJoin('users', 'u', 'tc.contact_id=u.user_contact');
+	$q->addWhere('(ut.user_id = ' . (int)$user_id  . ' or task_owner = ' . (int) $user_id . ' or u.user_id = ' . (int) $user_id . ')');
+}
+
 if ($project_id) {
 	$q->addWhere('task_project = ' . (int)$project_id);
 	//if we are on a project context make sure we show all tasks
@@ -198,6 +204,7 @@ switch ($f) {
 	case 'all':
 		break;
 	case 'delayed_tasks':{
+		//TODO: use date class to construct date.
 		$q->addWhere('task_end_date<\''.date('Y-m-d H:i:s').'\'');
 		$q->addWhere('task_percent_complete < 100');
 		break;
@@ -259,9 +266,6 @@ switch ($f) {
 		$q->addWhere('task_owner = ' . (int)$user_id);
 		break;
 	default:
-		$q->addTable('user_tasks');
-		$q->addWhere('user_tasks.user_id = ' . (int)$user_id);
-		$q->addWhere('user_tasks.task_id = tasks.task_id');
 		break;
 }
 
