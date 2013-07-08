@@ -252,8 +252,8 @@ class CTask_Log extends w2p_Core_BaseObject
             $task->overrideDatabase($this->_query);
             $task->load($task_id);
 
-			$task_end_date_time=new w2p_Utilities_Date($task->task_end_date,'europe/london');
-			$task_log_task_end_date=new w2p_Utilities_Date($this->task_log_task_end_date,'europe/london');
+			$task_end_date_time=new w2p_Utilities_Date($task->task_end_date,'Europe/London');
+			$task_log_task_end_date=new w2p_Utilities_Date($this->task_log_task_end_date,'Europe/London');
 			$task_log_task_end_date->setTime($task_end_date_time->getHour(),$task_end_date_time->getMinute(),$task_end_date_time->getSecond());
 			$this->task_log_task_end_date=$task_log_task_end_date->format('%Y-%m-%e %T');
 
@@ -261,7 +261,7 @@ class CTask_Log extends w2p_Core_BaseObject
             $task_end_date = (0 == $diff) ? $task->task_end_date : $this->task_log_task_end_date;
 
 			$now=new w2p_Utilities_Date();
-			$now->convertTZ('europe/london');
+			$now->convertTZ('Europe/London');
 			if ($now<$task_log_task_end_date){
 				$task_end_date=$now->format('%Y-%m-%e %T');
 			}
