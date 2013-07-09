@@ -120,11 +120,14 @@ if ($result) {
     $obj->updateDependencies($hdependencies,  $obj->task_id);
     if (isset($hdependencies) && '' != $hdependencies) {
         // there are dependencies set!
-        $nsd = new w2p_Utilities_Date($obj->get_deps_max_end_date($obj));
+        $nsd = new w2p_Utilities_Date($obj->get_deps_max_end_date($obj),'Europe/London');
+		$nsd->convertTZ($AppUI->user_prefs['TIMEZONE']);
 
         if (isset($start_date)) {
             $shift = $nsd->compare($start_date, $nsd);
             if ($shift < 1) {
+				$nsd->addDuration(1);
+				$nsd->addDuration(-1);
                 $obj->task_start_date = $nsd->format(FMT_DATETIME_MYSQL);
                 $obj->task_start_date = $AppUI->formatTZAwareTime($obj->task_start_date, '%Y-%m-%d %T');
 
