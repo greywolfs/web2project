@@ -140,7 +140,7 @@ foreach ($projects as $p) {
 // months to scroll
 $scroll_date = 1;
 
-$display_option = w2PgetParam($_POST, 'display_option', 'this_month');
+$display_option = w2PgetParam($_POST, 'display_option', 'all');
 
 // format dates
 $df = $AppUI->getPref('SHDATEFORMAT');
