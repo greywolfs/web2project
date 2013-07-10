@@ -127,24 +127,24 @@ if ($canViewTask) {
 $q->clear();
 $q2->clear();
 
-$q->addQuery('tasks.task_id, task_parent, task_name');
-$q->addQuery('task_start_date, task_end_date, task_dynamic');
+$q->addQuery('tasks.task_id, tasks.task_parent, tasks.task_name');
+$q->addQuery('tasks.task_start_date, tasks.task_end_date, tasks.task_dynamic');
 $q->addQuery('task_pinned, pin.user_id as pin_user');
 $q->addQuery('ut.user_task_priority');
-$q->addQuery('task_priority, task_percent_complete');
-$q->addQuery('task_duration, task_duration_type');
-$q->addQuery('task_project, task_represents_project');
-$q->addQuery('task_description, task_owner, task_status');
+$q->addQuery('tasks.task_priority, tasks.task_percent_complete');
+$q->addQuery('tasks.task_duration, tasks.task_duration_type');
+$q->addQuery('tasks.task_project, tasks.task_represents_project');
+$q->addQuery('tasks.task_description, tasks.task_owner, tasks.task_status');
 $q->addQuery('usernames.user_username, usernames.user_id');
 $q->addQuery('assignees.user_username as assignee_username');
 $q->addQuery('count(distinct assignees.user_id) as assignee_count');
 $q->addQuery('co.contact_first_name, co.contact_last_name');
 $q->addQuery('contact_display_name AS contact_name');
 $q->addQuery('contact_display_name AS owner');
-$q->addQuery('task_milestone');
+$q->addQuery('tasks.task_milestone');
 $q->addQuery('count(distinct f.file_task) as file_count');
 $q->addQuery('tlog.task_log_problem');
-$q->addQuery('task_access');
+$q->addQuery('tasks.task_access');
 
 //subquery the parent state
 $sq = new w2p_Database_Query;
@@ -163,8 +163,8 @@ if ($history_active) {
 	$q->leftJoin('history', 'h', 'history_item = tasks.task_id AND history_table=\'tasks\'');
 }
 
-$q->addJoin('projects', 'p', 'p.project_id = task_project', 'inner');
-$q->leftJoin('users', 'usernames', 'task_owner = usernames.user_id');
+$q->addJoin('projects', 'p', 'p.project_id = tasks.task_project', 'inner');
+$q->leftJoin('users', 'usernames', 'tasks.task_owner = usernames.user_id');
 $q->leftJoin('user_tasks', 'ut', 'ut.task_id = tasks.task_id');
 $q->leftJoin('users', 'assignees', 'assignees.user_id = ut.user_id');
 $q->leftJoin('contacts', 'co', 'co.contact_id = usernames.user_contact');
@@ -177,11 +177,11 @@ $q->leftJoin('user_task_pin', 'pin', 'tasks.task_id = pin.task_id AND pin.user_i
 if (!in_array($f,array('allunfinished','mycomp','unassigned','all','allfinished7days'))){
 	$q->leftJoin('task_contacts', 'tc', 'tasks.task_id=tc.task_id');
 	$q->leftJoin('users', 'u', 'tc.contact_id=u.user_contact');
-	$q->addWhere('(ut.user_id = ' . (int)$user_id  . ' or task_owner = ' . (int) $user_id . ' or u.user_id = ' . (int) $user_id . ')');
+	$q->addWhere('(ut.user_id = ' . (int)$user_id  . ' or tasks.task_owner = ' . (int) $user_id . ' or u.user_id = ' . (int) $user_id . ')');
 }
 
 if ($project_id) {
-	$q->addWhere('task_project = ' . (int)$project_id);
+	$q->addWhere('tasks.task_project = ' . (int)$project_id);
 	//if we are on a project context make sure we show all tasks
 	$f = 'all';
 } else { 
@@ -196,7 +196,7 @@ if ($task_id) {
 	$f = 'deepchildren';
 }
 if ($pinned_only) {
-	$q->addWhere('task_pinned = 1');
+	$q->addWhere('tasks.task_pinned = 1');
 }
 
 $f = (($f) ? $f : '');
@@ -205,8 +205,8 @@ switch ($f) {
 		break;
 	case 'delayed_tasks':{
 		//TODO: use date class to construct date.
-		$q->addWhere('task_end_date<\''.date('Y-m-d H:i:s').'\'');
-		$q->addWhere('task_percent_complete < 100');
+		$q->addWhere('tasks.task_end_date<\''.date('Y-m-d H:i:s').'\'');
+		$q->addWhere('tasks.task_percent_complete < 100');
 		break;
 	}
 	case 'delayed_projects':{
@@ -215,19 +215,19 @@ switch ($f) {
 		break;
 	}
 	case 'myfinished7days':
-		$q->addWhere('ut.user_id = ' . (int)$user_id);
+//		$q->addWhere('ut.user_id = ' . (int)$user_id);
 	case 'allfinished7days': // patch 2.12.04 tasks finished in the last 7 days
 		//$q->addTable('user_tasks');
-		$q->addTable('user_tasks');
-		$q->addWhere('user_tasks.user_id = ' . (int)$user_id);
-		$q->addWhere('user_tasks.task_id = tasks.task_id');
+//		$q->addTable('user_tasks');
+//		$q->addWhere('user_tasks.user_id = ' . (int)$user_id);
+//		$q->addWhere('user_tasks.task_id = tasks.task_id');
 
-		$q->addWhere('task_percent_complete = 100');
+		$q->addWhere('tasks.task_percent_complete = 100');
 		//TODO: use date class to construct date.
-		$q->addWhere('task_end_date >= \'' . date('Y-m-d 00:00:00', mktime(0, 0, 0, date('m'), date('d') - 7, date('Y'))) . '\'');
+		$q->addWhere('tasks.task_end_date >= \'' . date('Y-m-d 00:00:00', mktime(0, 0, 0, date('m'), date('d') - 7, date('Y'))) . '\'');
 		break;
 	case 'children':
-		$q->addWhere('task_parent = ' . (int)$task_id);
+		$q->addWhere('tasks.task_parent = ' . (int)$task_id);
 		$q->addWhere('tasks.task_id <> ' . $task_id);
 		break;
 	case 'deepchildren':
@@ -247,30 +247,37 @@ switch ($f) {
 		$q->addWhere('project_company = ' . (int)$AppUI->user_company);
 		break;
 	case 'myunfinished':
-		$q->addTable('user_tasks');
-		$q->addWhere('user_tasks.user_id = ' . (int)$user_id);
-		$q->addWhere('user_tasks.task_id = tasks.task_id');
-		$q->addWhere('(task_percent_complete < 100 OR task_end_date = \'\')');
+//		$q->addTable('user_tasks');
+//		$q->addWhere('user_tasks.user_id = ' . (int)$user_id);
+//		$q->addWhere('user_tasks.task_id = tasks.task_id');
+		$q->addWhere('(tasks.task_percent_complete < 100 OR tasks.task_end_date = \'\')');
 		break;
 	case 'allunfinished':
-		$q->addWhere('(task_percent_complete < 100 OR task_end_date = \'\')');
+		$q->addWhere('(tasks.task_percent_complete < 100 OR tasks.task_end_date = \'\')');
 		break;
 	case 'unassigned':
 		$q->leftJoin('user_tasks', 'ut_empty', 'tasks.task_id = ut_empty.task_id');
 		$q->addWhere('ut_empty.task_id IS NULL');
 		break;
 	case 'taskcreated':
-		$q->addWhere('task_creator = ' . (int)$user_id);
+		$q->addWhere('tasks.task_creator = ' . (int)$user_id);
 		break;
 	case 'taskowned':
-		$q->addWhere('task_owner = ' . (int)$user_id);
+		$q->addWhere('tasks.task_owner = ' . (int)$user_id);
+		break;
+	case 'current_tasks_for_the_project':
+		$q->leftJoin('task_dependencies','td','td.dependencies_task_id=tasks.task_id');
+		$q->leftJoin('tasks','dt','td.dependencies_req_task_id=dt.task_id');
+		$q->addWhere('tasks.task_start_date<\''.date('Y-m-d H:i:s').'\'');
+		$q->addWhere('(tasks.task_percent_complete < 100 OR tasks.task_end_date = \'\')');
+		$q->addWhere('(dt.task_percent_complete = 100 OR dt.task_percent_complete is null)');
 		break;
 	default:
 		break;
 }
 
 if ($showIncomplete) {
-	$q->addWhere('( task_percent_complete < 100 OR task_percent_complete IS NULL)');
+	$q->addWhere('( tasks.task_percent_complete < 100 OR tasks.task_percent_complete IS NULL)');
 }
 
 //TODO: This whole structure is hard-coded based on the TaskStatus SelectList.
@@ -289,18 +296,18 @@ if ($min_view && isset($_GET['task_status'])) {
 //When in task view context show all the tasks, active and inactive. (by not limiting the query by task status)
 //When in a project view or in the tasks list, show the active or the inactive tasks depending on the selected tab or button.
 if (!$task_id) {
-	$q->addWhere('task_status = ' . (int)$task_status);
+	$q->addWhere('tasks.task_status = ' . (int)$task_status);
 }
 if (isset($task_type) && (int) $task_type > 0) {
-	$q->addWhere('task_type = ' . (int)$task_type);
+	$q->addWhere('tasks.task_type = ' . (int)$task_type);
 }
 if (isset($task_owner) && (int) $task_owner > 0) {
-	$q->addWhere('task_owner = ' . (int)$task_owner);
+	$q->addWhere('tasks.task_owner = ' . (int)$task_owner);
 }
 
 if (($project_id || !$task_id) && !$min_view) {
 	if ($search_text = $AppUI->getState('searchtext')) {
-		$q->addWhere('( task_name LIKE (\'%' . $search_text . '%\') OR task_description LIKE (\'%' . $search_text . '%\') )');
+		$q->addWhere('( tasks.task_name LIKE (\'%' . $search_text . '%\') OR tasks.task_description LIKE (\'%' . $search_text . '%\') )');
 	}
 }
 
@@ -328,9 +335,9 @@ if (!$min_view && $f2 != 'allcompanies') {
 
 $q->addGroup('tasks.task_id');
 if (!$project_id && !$task_id) {
-	$q->addOrder('p.project_id, task_start_date, task_end_date');
+	$q->addOrder('p.project_id, tasks.task_start_date, tasks.task_end_date');
 } else {
-	$q->addOrder('task_start_date, task_end_date');
+	$q->addOrder('tasks.task_start_date, tasks.task_end_date');
 }
 //print_r($q->prepare());
 if ($canViewTask) {

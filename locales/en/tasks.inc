@@ -42,6 +42,7 @@
 'Begin new tasks if dependencies are finished before expected',
 'Calculate',
 'Calendar',
+'Current tasks for the project',
 'Change Priority of selected Tasks',
 'Change Task Project',
 'Change User specific Task Priority of selected Tasks',

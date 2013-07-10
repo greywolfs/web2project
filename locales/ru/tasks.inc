@@ -45,6 +45,7 @@
 'Calculate'=>'Расчитать',
 'Calendar'=>'Календарь',
 'calendar days'=>'календарных дней',
+'Current tasks for the project'=>'Текущие задачи по проекту',
 'Change Priority of selected Tasks'=>'Изменить приоритет',
 'Change Task Project'=>'Перенести в другой проект',
 'Change User specific Task Priority of selected Tasks'=>'',
