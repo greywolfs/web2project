@@ -79,7 +79,7 @@ $working_hours = ($w2Pconfig['daily_working_hours'] ? $w2Pconfig['daily_working_
 
 $q = new w2p_Database_Query;
 $q->addTable('projects', 'p');
-$q->addQuery('company_name, p.project_id, project_color_identifier, project_name, project_percent_complete');
+$q->addQuery('company_name, p.project_id, project_color_identifier, project_name, project_percent_complete, project_end_date, project_actual_end_date');
 $q->addJoin('companies', 'com', 'company_id = project_company', 'inner');
 $q->addJoin('tasks', 't1', 'p.project_id = t1.task_project', 'inner');
 $q->leftJoin('project_departments', 'project_departments', 'p.project_id = project_departments.project_id OR project_departments.project_id IS NULL');
@@ -107,13 +107,25 @@ $q2->addGroup('project_id');
 
 $perms = &$AppUI->acl();
 $projects = array();
-$canViewTask = canView('tasks');;
+$canViewTask = canView('tasks');
+$now= new w2p_Utilities_Date(null,'Europe/London');
 if ($canViewTask) {
 
 	$prc = $q->exec();
 	echo db_error();
 	while ($row = $q->fetchRow()) {
 		$projects[$row['project_id']] = $row;
+
+		if ($row['project_end_date']){
+			$projects[$row['project_id']]['project_end_date']=new w2p_Utilities_Date($row['project_end_date'],'Europe/London');
+		}
+		if ($row['project_actual_end_date']){
+			$projects[$row['project_id']]['project_actual_end_date']=new w2p_Utilities_Date($row['project_actual_end_date'],'Europe/London');
+		}
+		$projects[$row['project_id']]['color']='black';
+		if ($row['project_actual_end_date'] && $row['project_end_date'] && $projects[$row['project_id']]['project_actual_end_date']>$projects[$row['project_id']]['project_end_date']){
+			$projects[$row['project_id']]['color']='#CE3333';
+		}
 	}
 
 	$prc2 = $q2->fetchRow();
@@ -560,54 +572,53 @@ if ($showEditCheckbox) {
 					  <td>
 					   <?php echo $open_link; ?>
 					  </td>
-					  <td colspan="<?php echo ($w2Pconfig['direct_edit_assignment']) ? $cols - 3 : $cols; ?>">
-						  <table width="100%" border="0">
-							  <tr>
-									<!-- patch 2.12.04 display company name next to project name -->
-									<td nowrap="nowrap" style="border: outset #eeeeee 1px;background-color:#<?php echo $p['project_color_identifier']; ?>">
-										<a href="./index.php?m=projects&amp;a=view&amp;project_id=<?php echo $k; ?>">
-											<span style="color:<?php echo bestColor($p['project_color_identifier']); ?>;text-decoration:none;">
-											<strong><?php echo $p['company_name'] . ' :: ' . $p['project_name']; ?></strong></span>
-										</a>
-									</td>
-									<td width="<?php echo (101 - (int) $p['project_percent_complete']); ?>%">
-										<?php echo (int) $p['project_percent_complete']; ?>%
-									</td>
-							  </tr>
-						  </table>
+					  <td style="text-align: 'left';" colspan="<?php echo ($w2Pconfig['direct_edit_assignment']) ? $cols - 0 : $cols; ?>">
+						  <a href="./index.php?m=projects&amp;a=view&amp;project_id=<?php echo $k; ?>">
+											<span>
+											<strong
+												style="text-decoration:none;
+													color: <?php echo $p['color'] ?>;"
+												><?php echo $p['company_name'] . ' :: ' . $p['project_name']; ?></strong>
+							  (<?php echo (int) $p['project_percent_complete']; ?>%)
+											</span>
+						  </a>
+							<div nowrap="nowrap" style="height:3px; border: solid 1px;background-color:#<?php echo $p['project_color_identifier']; ?>; width:<?php echo ((int) $p['project_percent_complete']==0?1:$p['project_percent_complete']); ?>%;">
+							</div>
 					  </td>
 						<?php
 							if ($w2Pconfig['direct_edit_assignment']) {
 								?>
+								<!--
 							  <td colspan="3" align="right" valign="middle">
-								  <table width="100%" border="0">
+<table width="100%" border="0">
 									  <tr>
 											<td align="right">
-												<select name="add_users" style="width:200px" size="2" multiple="multiple" class="text" ondblclick="javascript:chAssignment(<?php echo ($p['project_id']); ?>, 0, false)">
+												<select name="add_users" style="width:200px" size="2" multiple="multiple" class="text" ondblclick="javascript:chAssignment(<?php /*echo ($p['project_id']); */?>, 0, false)">
 													<?php
-															foreach ($userAlloc as $v => $u) {
+/*															foreach ($userAlloc as $v => $u) {
 																echo '<option value="' . $u['user_id'] . '">' . w2PformSafe($u['userFC']) . "</option>\n";
 															}
-													?>
+													*/?>
 												</select>
 											</td>
 											<td align="center">
 												<?php
-													echo ('<a href="javascript:chAssignment(' . $p['project_id'] . ', 0, 0);">' . w2PshowImage('add.png', 16, 16, 'Assign Users', 'Assign selected Users to selected Tasks', 'tasks') . "</a>\n");
+/*													echo ('<a href="javascript:chAssignment(' . $p['project_id'] . ', 0, 0);">' . w2PshowImage('add.png', 16, 16, 'Assign Users', 'Assign selected Users to selected Tasks', 'tasks') . "</a>\n");
 													echo ('<a href="javascript:chAssignment(' . $p['project_id'] . ', 1, 1);">' . w2PshowImage('remove.png', 16, 16, 'Unassign Users', 'Unassign Users from Task', 'tasks') . "</a>\n");
-												?>
+												*/?>
 												<br />
-												<select class="text" name="percentage_assignment" title="<?php echo ($AppUI->_('Assign with Percentage')); ?>" >
+												<select class="text" name="percentage_assignment" title="<?php /*echo ($AppUI->_('Assign with Percentage')); */?>" >
 													<?php
-														for ($i = 0; $i <= 100; $i += 5) {
+/*														for ($i = 0; $i <= 100; $i += 5) {
 															echo ("\t" . '<option ' . (($i == 30) ? 'selected="true"' : '') . ' value="' . $i . '">' . $i . '%</option>');
 														}
-													?>
+													*/?>
 												</select>
 											</td>
 									  </tr>
 								  </table>
 							  </td>
+								  -->
 								<?php
 							}
 						?>
