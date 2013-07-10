@@ -140,7 +140,7 @@ $contacts = $q->loadHashList('contact_id');
 								$contact_company = $contact_data['company_name'];
 							}
 							if ($contact_company && $contact_company != $actual_company) {
-								echo '<label><h4><input type="checkbox" class="check_all" check_class="company_'.$contact_data['contact_company'].'"/>' . $contact_company . '</h4><label>';
+								echo '<label><h4><input type="checkbox" class="check_all" check_class="company_'.$contact_data['contact_company'].'"/>' . $contact_company . '</h4></label>';
 								$actual_company = $contact_company;
 							}
 							$contact_department = $contact_data['dept_name'] ? $contact_data['dept_name'] : $contact_data['contact_department'];
