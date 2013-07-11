@@ -48,7 +48,7 @@ if (isset($_GET['orderby'])) {
 $AppUI->setState('ProjIdxOrderDir', $orderdir);
 
 // collect the full projects list data via function in projects.class.php
-$projects = $AppUI->user_is_admin?projects_list_data():projects_list_data($AppUI->user_id);
+$projects = ($AppUI->user_is_admin || $AppUI->user_is_controller)?projects_list_data():projects_list_data($AppUI->user_id);
 
 $oCompany = new CCompany;
 $allowedCompanies[-1] = $AppUI->_('all');
