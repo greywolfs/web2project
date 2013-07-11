@@ -572,17 +572,17 @@ if ($showEditCheckbox) {
 					  <td>
 					   <?php echo $open_link; ?>
 					  </td>
-					  <td style="text-align: 'left';" colspan="<?php echo ($w2Pconfig['direct_edit_assignment']) ? $cols - 0 : $cols; ?>">
+					  <td style="text-align: left;" colspan="<?php echo ($w2Pconfig['direct_edit_assignment']) ? $cols - 0 : $cols; ?>">
 						  <a href="./index.php?m=projects&amp;a=view&amp;project_id=<?php echo $k; ?>">
 											<span>
 											<strong
 												style="text-decoration:none;
 													color: <?php echo $p['color'] ?>;"
 												><?php echo $p['company_name'] . ' :: ' . $p['project_name']; ?></strong>
-							  (<?php echo (int) $p['project_percent_complete']; ?>%)
+							  (<b><?php echo (int) $p['project_percent_complete']; ?>%</b>)
 											</span>
 						  </a>
-							<div nowrap="nowrap" style="height:3px; border: solid 1px;background-color:#<?php echo $p['project_color_identifier']; ?>; width:<?php echo ((int) $p['project_percent_complete']==0?1:$p['project_percent_complete']); ?>%;">
+							<div nowrap="nowrap" style="height:6px; border: solid 1px;background-color:#<?php echo $p['project_color_identifier']; ?>; width:<?php echo ((int) $p['project_percent_complete']==0?1:$p['project_percent_complete']); ?>%;">
 							</div>
 					  </td>
 						<?php
