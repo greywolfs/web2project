@@ -89,12 +89,37 @@ function delIt() {
 	<input type="hidden" name="del" value="1" />
 	<input type="hidden" name="task_id" value="<?php echo $task_id; ?>" />
 </form>
-
+<style>
+	#task_title th{
+		text-align: left;
+		background-image: none;
+	}
+	#task_title :hover {
+		background-color: #ffffcc
+	};
+</style>
+<script>
+	$(document).ready(function(){
+		var description=document.getElementById('task_description');
+		var title=document.getElementById('task_title');
+		col=document.getElementById('displayImg');
+		title.style.cursor='pointer';
+		title.onclick=function(){
+			if (description.style.display=='none') {
+				description.style.display="table-row";
+				col.src="<?php echo w2PfindImage('icons/collapse.gif'); ?>";
+			} else {
+				description.style.display="none";
+				col.src="<?php echo w2PfindImage('icons/expand.gif'); ?>";
+			}
+		}
+	})
+</script>
 <table border="0" cellpadding="4" cellspacing="0" width="100%" class="std view">
-    <tr>
-        <th colspan="2"><?php echo $obj->task_name; ?></th>
+    <tr id="task_title">
+        <th colspan="2"><img border="0" align="middle" id="displayImg" alt="" src="./style/web2project/images/icons/expand.gif"> <?php echo $obj->task_name; ?></th>
     </tr>
-    <tr>
+    <tr id="task_description" style="display:none;">
         <td width="50%" valign="top" class="view-column">
             <strong><?php echo $AppUI->_('Details'); ?></strong>
             <table width="100%" cellspacing="1" cellpadding="2" class="well">
