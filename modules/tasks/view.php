@@ -434,7 +434,7 @@ function is_tasks_member(){
 	}
 	$task_contacts = $obj->getContacts(null,$obj->task_id);
 	foreach ($task_contacts as $contact){
-		if ($AppUI->user_id==$contact['contact_id']){
+		if ($AppUI->user_contact_id==$contact['contact_id']){
 			$is_tasks_member=true;
 			return $is_tasks_member;
 		}
@@ -443,7 +443,7 @@ function is_tasks_member(){
 	$project->project_id = $obj->task_project;
 	$project_contacts = $project->getContactList();
 	foreach ($project_contacts as $contact){
-		if ($AppUI->user_id==$contact['contact_id']){
+		if ($AppUI->user_contact_id==$contact['contact_id']){
 			$is_tasks_member=true;
 			return $is_tasks_member;
 		}
