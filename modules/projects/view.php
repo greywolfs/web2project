@@ -134,10 +134,10 @@ function delIt() {
 	<input type="hidden" name="project_id" value="<?php echo $project_id; ?>" />
 </form>
 <table id="tblProjects" border="0" cellpadding="4" cellspacing="0" width="100%" class="std view">
-<tr>
+<tr onclick="doDetails()" style="cursor:pointer">
 	<td style="border: outset #d1d1cd 1px;background-color:#<?php echo $project->project_color_identifier; ?>" colspan="2" id="view-header">
 	<?php
-        echo '	<a href="javascript:doDetails()">
+        echo '
 					<img border="0" align="middle" id="displayImg" alt="" src="' . w2PfindImage('icons/expand.gif') . '" />
 				</a>
 				<font color="' . bestColor($project->project_color_identifier) . '"><strong>' . $project->project_name . '<strong></font>
