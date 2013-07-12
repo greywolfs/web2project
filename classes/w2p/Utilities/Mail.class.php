@@ -382,6 +382,17 @@ class w2p_Utilities_Mail extends PHPMailer
         }
 
         ($this->transport == 'smtp') ? $this->IsSMTP() : $this->IsMail();
+		$this->defer=false;
+		foreach ($this->ato as $to){
+			$this->AddAddress($to);
+		}
+		foreach ($this->acc as $to){
+			$this->AddCC($to);
+		}
+		foreach ($this->abcc as $to){
+			$this->AddBCC($to);
+		}
+		$this->SetFrom($this->From,$this->FromName);
 
         return $this->Send();
     }
