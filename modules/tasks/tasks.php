@@ -579,10 +579,10 @@ if ($showEditCheckbox) {
 												style="text-decoration:none;
 													color: <?php echo $p['color'] ?>;"
 												><?php echo $p['company_name'] . ' :: ' . $p['project_name']; ?></strong>
-							  (<b><?php echo (int) $p['project_percent_complete']; ?>%</b>)
 											</span>
 						  </a>
-							<div nowrap="nowrap" style="height:6px; border: solid 1px;background-color:#<?php echo $p['project_color_identifier']; ?>; width:<?php echo ((int) $p['project_percent_complete']==0?1:$p['project_percent_complete']); ?>%;">
+							<div nowrap="nowrap" style="text-align:center; border: solid 1px;background-color:#<?php echo $p['project_color_identifier']; ?>; width:<?php echo ((int) $p['project_percent_complete']==0?1:$p['project_percent_complete']); ?>%;">
+								<b style="color:<?php echo bestColor($p['project_color_identifier']) ?>"><?php echo (int) $p['project_percent_complete']; ?>%</b>
 							</div>
 					  </td>
 						<?php
