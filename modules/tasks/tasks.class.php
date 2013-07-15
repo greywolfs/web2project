@@ -34,6 +34,7 @@ class CTask extends w2p_Core_BaseObject
      */
     public $task_parent = null;
     public $task_milestone = null;
+	public $task_without_plan_date = null;
     public $task_project = null;
     public $task_owner = null;
     public $task_start_date = null;
@@ -165,6 +166,7 @@ class CTask extends w2p_Core_BaseObject
 
         // ensure changes to checkboxes are honoured
         $this->task_milestone = (int) $this->task_milestone;
+		$this->task_without_plan_date = (int) $this->task_without_plan_date;
         $this->task_dynamic = (int) $this->task_dynamic;
 
         $this->task_percent_complete = (int) $this->task_percent_complete;
@@ -1035,6 +1037,7 @@ class CTask extends w2p_Core_BaseObject
         $q->addTable('tasks');
         $q->addWhere('task_dynamic <> 1');
         $q->addWhere('task_project = ' . (int) $project_id);
+        $q->addWhere('task_without_plan_date=0');
         $q->addGroup('task_project');
 
         return $q->loadHash();

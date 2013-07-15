@@ -132,6 +132,8 @@
 'No tasks to display'=>'Нет задач к отображению',
 'None'=>'Пусто',
 'Normal Log'=>'Обычный отчет',
+'Task for pay'=>'По оплате',
+'Internal task'=>'Внутренняя',
 'Not Specified'=>'Не определенный',
 'Notify creator'=>'Создатель оповещения',
 'Off'=>'Выключить',

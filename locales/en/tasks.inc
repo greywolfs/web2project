@@ -127,6 +127,8 @@
 'No tasks to display',
 'None',
 'Normal Log',
+'Task for pay',
+'Internal task',
 'Notify creator',
 'Off',
 'On',

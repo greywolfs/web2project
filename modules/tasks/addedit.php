@@ -30,6 +30,12 @@ if (!$task && $task_id > 0) {
 	$AppUI->redirect();
 }
 
+$task_without_plan_types=array(
+    '0'=>'',
+    '1'=>'Task for pay',
+    '2'=>'Internal task',
+);
+
 $percent = array(0 => '0', 5 => '5', 10 => '10', 15 => '15', 20 => '20', 25 => '25', 30 => '30', 35 => '35', 40 => '40', 45 => '45', 50 => '50', 55 => '55', 60 => '60', 65 => '65', 70 => '70', 75 => '75', 80 => '80', 85 => '85', 90 => '90', 95 => '95', 100 => '100');
 $status = w2PgetSysVal('TaskStatus');
 $priority = w2PgetSysVal('TaskPriority');
@@ -226,6 +232,13 @@ function popContacts() {
                     <td align="right" nowrap="nowrap"><label for="task_milestone"><?php echo $AppUI->_('Milestone'); ?>?</label></td>
                     <td>
                         <input type="checkbox" value="1" name="task_milestone" id="task_milestone" <?php if ($task->task_milestone) { ?>checked="checked"<?php } ?> onClick="toggleMilestone()" />
+                    </td>
+                </tr>
+                <tr>
+					<td></td><td></td>
+                    <td align="right" nowrap="nowrap"><?php echo $AppUI->_('Task Type');?></td>
+                    <td>
+                        <?php echo arraySelect($task_without_plan_types, 'task_without_plan_date', 'size="1" class="text"', $task->task_without_plan_date,true); ?>
                     </td>
                 </tr>
                 </table>
