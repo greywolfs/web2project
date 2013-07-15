@@ -522,6 +522,17 @@ if ($showEditCheckbox) {
     $fieldNames[] = '';
 }
 ?>
+<style>
+    td._owner, td._datetime, td._update, td.data{
+        white-space: pre-wrap;
+    }
+    td.performers, td._owner{
+        min-width: 100px;
+    }
+    #tblProjects th{
+        font:10px verdana, arial, helvetica, sans-serif;
+    }
+</style>
 <table id="tblProjects" class="tbl list">
     <tr>
         <?php
@@ -574,12 +585,10 @@ if ($showEditCheckbox) {
 					  </td>
 					  <td style="text-align: left;" colspan="<?php echo ($w2Pconfig['direct_edit_assignment']) ? $cols - 0 : $cols; ?>">
 						  <a href="./index.php?m=projects&amp;a=view&amp;project_id=<?php echo $k; ?>">
-											<span>
 											<strong
 												style="text-decoration:none;
 													color: <?php echo $p['color'] ?>;"
 												><?php echo $p['company_name'] . ' :: ' . $p['project_name']; ?></strong>
-											</span>
 						  </a>
 							<div nowrap="nowrap" style="text-align:center; border: solid 1px;background-color:#<?php echo $p['project_color_identifier']; ?>; width:<?php echo ((int) $p['project_percent_complete']==0?1:$p['project_percent_complete']); ?>%;">
 								<b style="color:<?php echo bestColor($p['project_color_identifier']) ?>"><?php echo (int) $p['project_percent_complete']; ?>%</b>
