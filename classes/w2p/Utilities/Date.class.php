@@ -298,16 +298,16 @@ class w2p_Utilities_Date extends Date {
 
 				// calc the remaining time and the full working days part of this residual
 				$hoursRemaining = ($duration > $dwh) ? ($duration % $dwh) : $duration;
-				$full_working_days = round(($duration - $hoursRemaining) / $dwh);
+				$full_working_days = floor($duration / $dwh);
 
 				// (proceed the full days later)
 
 				// proceed the last day now
 
 				// we prefer wed 16:00 over thu 08:00 as end date :)
-				if ($hoursRemaining == 0 && $full_working_day > 0) {
+				if ($hoursRemaining == 0 && $full_working_days > 0) {
 					$full_working_days--;
-					($sgn > 0) ? $this->setHour($cal_day_start + $dwh) : $this->setHour($cal_day_end - $dwh);
+					($sgn > 0) ? $this->setHour($cal_day_end) : $this->setHour($cal_day_start);
 				} else {
 					($sgn > 0) ? $this->setHour($cal_day_start + $hoursRemaining) : $this->setHour($cal_day_end - $hoursRemaining);
 				}
@@ -325,7 +325,7 @@ class w2p_Utilities_Date extends Date {
 		}
 		//end of proceeding the fulldays
 
-		return $this->next_working_day();
+		return $this->next_working_day(true);
 	}
 
 	/**

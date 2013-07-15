@@ -121,18 +121,21 @@ if ($result) {
     if (isset($hdependencies) && '' != $hdependencies) {
         // there are dependencies set!
         $nsd = new w2p_Utilities_Date($obj->get_deps_max_end_date($obj),'Europe/London');
-		$nsd->convertTZ($AppUI->user_prefs['TIMEZONE']);
 
         if (isset($start_date)) {
             $shift = $nsd->compare($start_date, $nsd);
             if ($shift < 1) {
+                $nsd->convertTZ($AppUI->user_prefs['TIMEZONE']);
 				$nsd->addDuration(1);
 				$nsd->addDuration(-1);
+                $nsd->convertTZ('Europe/London');
                 $obj->task_start_date = $nsd->format(FMT_DATETIME_MYSQL);
-                $obj->task_start_date = $AppUI->formatTZAwareTime($obj->task_start_date, '%Y-%m-%d %T');
+//                $obj->task_start_date = $AppUI->formatTZAwareTime($obj->task_start_date, '%Y-%m-%d %T');
 
-                $ned = new w2p_Utilities_Date($obj->task_start_date);
+                $ned = new w2p_Utilities_Date($obj->task_start_date,'Europe/London');
+                $ned->convertTZ($AppUI->user_prefs['TIMEZONE']);
                 $ned->addDuration($obj->task_duration, $obj->task_duration_type);
+                $ned->convertTZ('Europe/London');
                 $obj->task_end_date = $ned->format(FMT_DATETIME_MYSQL);
 
                 $obj->store();
