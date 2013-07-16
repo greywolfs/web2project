@@ -260,10 +260,14 @@ class CTask_Log extends w2p_Core_BaseObject
             $diff = strtotime($this->task_log_task_end_date) - strtotime($task->task_end_date);
             $task_end_date = (0 == $diff) ? $task->task_end_date : $this->task_log_task_end_date;
 
-			$now=new w2p_Utilities_Date();
-			$now->convertTZ('Europe/London');
-			if ($now<$task_log_task_end_date){
-				$task_end_date=$now->format('%Y-%m-%e %T');
+			if ($percentComplete==100){
+				$now=new w2p_Utilities_Date();
+				$now->convertTZ('Europe/London');
+				if ($now<$task_log_task_end_date){
+					$now->prev_working_day();
+					$now->setTime($task_end_date_time->getHour(),$task_end_date_time->getMinute(),$task_end_date_time->getSecond());
+					$task_end_date=$now->format('%Y-%m-%e %T');
+				}
 			}
 
             /*
