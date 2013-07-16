@@ -124,10 +124,9 @@ if ($result) {
 
         if (isset($start_date)) {
             $shift = $nsd->compare($start_date, $nsd);
-            if ($shift < 1) {
+            if ($shift == -1) {
                 $nsd->convertTZ($AppUI->user_prefs['TIMEZONE']);
-				$nsd->addDuration(1);
-				$nsd->addDuration(-1);
+				$nsd->next_working_day();
                 $nsd->convertTZ('Europe/London');
                 $obj->task_start_date = $nsd->format(FMT_DATETIME_MYSQL);
 //                $obj->task_start_date = $AppUI->formatTZAwareTime($obj->task_start_date, '%Y-%m-%d %T');
