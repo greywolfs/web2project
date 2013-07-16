@@ -1098,7 +1098,7 @@ class CTask extends w2p_Core_BaseObject
                 continue;
             }
 
-            $nsd = new w2p_Utilities_Date($lastEndDate);
+            $nsd = new w2p_Utilities_Date($lastEndDate,'Europe/London');
             // Because we prefer the beginning of the next day as opposed to the
             //   end of the current for a task_start_date
             $nsd = $nsd->next_working_day();
@@ -1115,9 +1115,7 @@ class CTask extends w2p_Core_BaseObject
             $ned = $ned->prev_working_day();
 
             $new_start_date = $nsd->format(FMT_DATETIME_MYSQL);
-            $new_start_date = $this->_AppUI->convertToSystemTZ($new_start_date);
             $new_end_date = $ned->format(FMT_DATETIME_MYSQL);
-            $new_end_date = $this->_AppUI->convertToSystemTZ($new_end_date);
 
             $q = $this->_getQuery();
             $q->addTable('tasks');
