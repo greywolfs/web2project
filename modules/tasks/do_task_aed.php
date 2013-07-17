@@ -124,7 +124,7 @@ if ($result) {
 
         if (isset($start_date)) {
             $shift = $nsd->compare($start_date, $nsd);
-            if ($shift == -1) {
+            if ($shift < 1) {
                 $nsd->convertTZ($AppUI->user_prefs['TIMEZONE']);
 				$nsd->next_working_day();
                 $nsd->convertTZ('Europe/London');

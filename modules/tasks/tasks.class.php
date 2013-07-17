@@ -1087,8 +1087,10 @@ class CTask extends w2p_Core_BaseObject
 
         foreach($dependent_tasks as $_task_id => $_task_data) {
             $task_start_int = strtotime($_task_data['task_start_date']);
+			$task_start= new w2p_Utilities_Date($_task_data['task_start_date']);
+			$end = (int) w2PgetConfig('cal_day_end');
 
-            if ($task_start_int == $task_end_int) {
+            if ($task_start_int == $task_end_int && $task_start->getHour() < $end) {
                 /**
                  * Remember, this continue just means 'skip this iteration and
                  *   go to the next one.' In this case, we're skipping the
@@ -1101,19 +1103,21 @@ class CTask extends w2p_Core_BaseObject
             $nsd = new w2p_Utilities_Date($lastEndDate,'Europe/London');
             // Because we prefer the beginning of the next day as opposed to the
             //   end of the current for a task_start_date
-            $nsd = $nsd->next_working_day();
+			$nsd->convertTZ($this->_AppUI->user_prefs['TIMEZONE']);
+			$nsd->next_working_day();
 
             $multiplier = ('24' == $_task_data['task_duration_type']) ? 3 : 1;
             $d = $_task_data['task_duration'] * $multiplier;
 
-            $ned = new w2p_Utilities_Date();
-            $ned->copy($nsd);
+            $ned = clone $nsd;
             $ned->addDuration($d);
 
             // Because we prefer the end of the previous as opposed to the
             //   beginning of the current for a task_end_date
-            $ned = $ned->prev_working_day();
+            $ned->prev_working_day();
 
+			$nsd->convertTZ('Europe/London');
+			$ned->convertTZ('Europe/London');
             $new_start_date = $nsd->format(FMT_DATETIME_MYSQL);
             $new_end_date = $ned->format(FMT_DATETIME_MYSQL);
 
