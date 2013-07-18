@@ -1081,6 +1081,7 @@ class CTask extends w2p_Core_BaseObject
      */
     public function pushDependencies($task_id, $lastEndDate)
     {
+		$dwh = (int) w2PgetConfig('daily_working_hours');
         $task_end_int = strtotime($lastEndDate);
 
         $dependent_tasks = $this->getDependentTaskList($task_id);
@@ -1106,7 +1107,7 @@ class CTask extends w2p_Core_BaseObject
 			$nsd->convertTZ($this->_AppUI->user_prefs['TIMEZONE']);
 			$nsd->next_working_day();
 
-            $multiplier = ('24' == $_task_data['task_duration_type']) ? 3 : 1;
+            $multiplier = ('24' == $_task_data['task_duration_type']) ? $dwh : 1;
             $d = $_task_data['task_duration'] * $multiplier;
 
             $ned = clone $nsd;
