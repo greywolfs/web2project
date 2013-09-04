@@ -332,7 +332,7 @@ class w2p_Utilities_Mail extends PHPMailer
             $this->CheckAddresses($this->ato);
         }
 
-/*        foreach ($this->ato as $to_address) {
+        foreach ($this->ato as $to_address) {
             if (strpos($to_address, '<') !== false) {
                 preg_match('/^.*<([^@]+\@[a-z0-9\._-]+)>/i', $to_address, $matches);
                 if (isset($matches[1])) {
@@ -341,8 +341,8 @@ class w2p_Utilities_Mail extends PHPMailer
             }
             $this->ClearAddresses();
             $this->AddAddress($to_address);
-        }*/
-		$this->Send();
+			$this->Send();
+        }
         return true;
     }
 

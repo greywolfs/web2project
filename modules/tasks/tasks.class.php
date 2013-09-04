@@ -1390,8 +1390,9 @@ class CTask extends w2p_Core_BaseObject
                 }
             }
 
-            $sendToList = array_keys($mail_recipients);
-            $mail->SendSeparatelyTo($sendToList);
+            $mail->ato = array_keys($mail_recipients);
+			$mail->Send();
+//            $mail->SendSeparatelyTo($sendToList);
 
             // Now update the log
             $save_email = $this->_AppUI->getPref('TASKLOGNOTE');
