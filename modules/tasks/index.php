@@ -79,7 +79,7 @@ if ($AppUI->user_is_admin || $AppUI->user_is_controller) {
     $titleBlock->addCell($AppUI->_('User') . ':');
 }
 
-$titleBlock->addCell('<form action="?m=tasks" method="post" name="departmentsFilter" accept-charset="utf-8">' . arraySelect($sDepartmentsFilterArray, 'sDepartmentsFilter', 'class="text" onChange="document.departmentsFilter.submit();"', $sDepartmentsFilter, false) . arraySelect($departmentList, 'fDepartmentsFilter', 'size="1" class="text" onChange="document.departmentsFilter.submit();"', $fDepartmentsFilter, false) . '</form>');
+$titleBlock->addCell('<form action="?m=tasks" method="post" name="departmentsFilter" accept-charset="utf-8">' . arraySelect($sDepartmentsFilterArray, 'sDepartmentsFilter', 'class="text" onChange="document.departmentsFilter.submit();"', $sDepartmentsFilter, false) . arraySelect($departmentList, 'fDepartmentsFilter', 'size="1" style="max-width: 125px;" class="text" onChange="document.departmentsFilter.submit();"', $fDepartmentsFilter, false) . '</form>');
 $titleBlock->addCell($AppUI->_('Departments') . ':');
 
 $titleBlock->addCell('<form action="?m=tasks" method="post" name="companyFilter" accept-charset="utf-8">' . arraySelect($filters2, 'f2', 'size="1" class="text" onChange="document.companyFilter.submit();"', $f2, false) . '</form>');
