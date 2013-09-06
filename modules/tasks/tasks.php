@@ -345,6 +345,16 @@ if (!$min_view && $f2 != 'allcompanies') {
 	$q->addWhere('company_id = ' . (int) $f2);
 }
 
+//filter by departments
+if ($fDepartmentsFilter){
+	$q->leftJoin('task_departments', 'tdept', 'tdept.task_id = tasks.task_id');
+	if ($sDepartmentsFilter=='only'){
+		$q->addWhere('tdept.department_id = ' . (int) $fDepartmentsFilter);
+	}else{
+		$q->addWhere('(tdept.department_id is null or tdept.department_id != ' . (int) $fDepartmentsFilter . ')');
+	}
+}
+
 $q->addGroup('tasks.task_id');
 if (!$project_id && !$task_id) {
 	$q->addOrder('p.project_id, tasks.task_start_date, tasks.task_end_date');

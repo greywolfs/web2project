@@ -297,7 +297,7 @@ class CDepartment extends w2p_Core_BaseObject {
 		}
 	}
 
-	public static function getDepartmentList($AppUI = null, $companyId, $departmentId = 0) {
+	public static function getDepartmentList($AppUI = null, $companyId=0, $departmentId = 0) {
 		global $AppUI;
 
         $q = new w2p_Database_Query();
@@ -306,7 +306,9 @@ class CDepartment extends w2p_Core_BaseObject {
 		if (is_int($departmentId)) {
 			$q->addWhere('dept_parent = ' . (int) $departmentId);
 		}
-		$q->addWhere('dept_company = ' . (int) $companyId);
+		if ((int)$companyId){
+			$q->addWhere('dept_company = ' . (int) $companyId);
+		}
 		$q->addOrder('dept_name');
 		$department = new CDepartment;
 //TODO: We need to convert this from static to use ->overrideDatabase() for testing.

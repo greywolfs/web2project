@@ -31,6 +31,19 @@ if (isset($_POST['f2'])) {
 $f2 = ($AppUI->getState('CompanyIdxFilter')) ? $AppUI->getState('CompanyIdxFilter') :
         ((w2PgetConfig('company_filter_default', 'user') == 'user') ? $AppUI->user_company : 'allcompanies');
 
+if (isset($_POST['fDepartmentsFilter'])) {
+	$AppUI->setState('fDepartmentsFilter', (int)$_POST['fDepartmentsFilter']);
+	$AppUI->setState('sDepartmentsFilter', $_POST['sDepartmentsFilter']);
+}
+$fDepartmentsFilter = $AppUI->getState('fDepartmentsFilter') ? $AppUI->getState('fDepartmentsFilter') :	'0';
+$sDepartmentsFilter = $AppUI->getState('sDepartmentsFilter') ? $AppUI->getState('sDepartmentsFilter') :	'only';
+$sDepartmentsFilterArray = array('only'=>'Только','without'=>'Исключая');
+$departmentListArray = CDepartment::getDepartmentList($AppUI, (int)$f2);
+$departmentList=array('0'=>'Все департаменты');
+foreach ($departmentListArray as $dep){
+	$departmentList[$dep['dept_id']]=$dep['dept_name'];
+}
+
 if (isset($_GET['project_id'])) {
 	$AppUI->setState('TaskIdxProject', w2PgetParam($_GET, 'project_id', null));
 }
@@ -65,6 +78,9 @@ if ($AppUI->user_is_admin || $AppUI->user_is_controller) {
 	$titleBlock->addCell('<form action="?m=tasks" method="post" name="userIdForm" accept-charset="utf-8">' . arraySelect($user_list, 'user_id', 'size="1" class="text" onChange="document.userIdForm.submit();"', $user_id, false) . '</form>');
     $titleBlock->addCell($AppUI->_('User') . ':');
 }
+
+$titleBlock->addCell('<form action="?m=tasks" method="post" name="departmentsFilter" accept-charset="utf-8">' . arraySelect($sDepartmentsFilterArray, 'sDepartmentsFilter', 'class="text" onChange="document.departmentsFilter.submit();"', $sDepartmentsFilter, false) . arraySelect($departmentList, 'fDepartmentsFilter', 'size="1" class="text" onChange="document.departmentsFilter.submit();"', $fDepartmentsFilter, false) . '</form>');
+$titleBlock->addCell($AppUI->_('Departments') . ':');
 
 $titleBlock->addCell('<form action="?m=tasks" method="post" name="companyFilter" accept-charset="utf-8">' . arraySelect($filters2, 'f2', 'size="1" class="text" onChange="document.companyFilter.submit();"', $f2, false) . '</form>');
 $titleBlock->addCell($AppUI->_('Company') . ':');
