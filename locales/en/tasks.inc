@@ -108,6 +108,8 @@
 'Last Update',
 'Levels to display',
 'Log',
+'Log updated',
+'Log added',
 'Low Priority Tasks',
 'Mark as Finished',
 'Milestone',

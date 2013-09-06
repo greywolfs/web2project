@@ -1228,7 +1228,7 @@ class CTask extends w2p_Core_BaseObject
 		$project = new CProject();
 		$projname = $project->load($this->task_project)->project_name;
 
-        $mail->Subject($projname . '::' . $this->task_name . ' ' . $this->_AppUI->_($this->_action, UI_OUTPUT_RAW), $this->_locale_char_set);
+        $mail->Subject($this->_AppUI->_($this->_action, UI_OUTPUT_RAW) . ': ' . $projname . '::' . $this->task_name, $this->_locale_char_set);
 
         // c = creator
         // a = assignee
@@ -1371,8 +1371,8 @@ class CTask extends w2p_Core_BaseObject
             $char_set = isset($this->_locale_char_set) ? $this->_locale_char_set : '';
             $mail = new w2p_Utilities_Mail();
             // Grab the subject from user preferences
-            $prefix = $this->_AppUI->getPref('TASKLOGSUBJ');
-            $mail->Subject($prefix . ' ' . $log->task_log_name, $char_set);
+			$action=$this->_AppUI->_(empty($log->task_log_created) ? 'Log updated' : 'Log added', UI_OUTPUT_RAW);
+            $mail->Subject($action . ': ' . $log->task_log_name, $char_set);
 
             $emailManager = new w2p_Output_EmailManager($this->_AppUI);
             $body = $emailManager->getTaskEmailLog($this, $log);

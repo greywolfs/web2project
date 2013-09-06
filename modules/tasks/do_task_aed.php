@@ -174,6 +174,7 @@ if ($result) {
     }
 
     if ($notify) {
+		$obj->_action = $task_id ? 'Task updated' : 'Task added';
         $obj->notify($comment);
     }
 
