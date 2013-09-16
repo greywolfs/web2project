@@ -596,7 +596,7 @@ if ($showEditCheckbox) {
 					  <td style="text-align: left;" colspan="<?php echo ($w2Pconfig['direct_edit_assignment']) ? $cols - 0 : $cols; ?>">
 						  <a href="./index.php?m=projects&amp;a=view&amp;project_id=<?php echo $k; ?>">
 											<strong
-												style="text-decoration:none;
+												style="text-decoration:none; white-space: normal;
 													color: <?php echo $p['color'] ?>;"
 												><?php echo $p['company_name'] . ' :: ' . $p['project_name']; ?></strong>
 						  </a>
