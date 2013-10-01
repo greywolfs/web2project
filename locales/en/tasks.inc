@@ -159,6 +159,7 @@
 'Project',
 'Project Contacts',
 'Project Hours',
+'Project priority',
 'Project Tasks',
 'Projects on Hold',
 'Ref',

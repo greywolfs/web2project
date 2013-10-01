@@ -168,6 +168,7 @@
 'Project Tasks'=>'Задачи проекта',
 'Project name'=>'Наименование проекта',
 'Projects on Hold'=>'Проекты в ожидании',
+'Project priority'=>'Приоритет проекта',
 'Ref'=>'Ref',
 'Reference'=>'Источник',
 'Reports'=>'Отчеты',
