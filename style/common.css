@@ -209,7 +209,7 @@ input[type="checkbox"] {
  */
 .list td {
     text-align: center;
-    white-space:nowrap;
+    /*white-space:nowrap;*/
 }
 .list td._name{
 	white-space:normal;
