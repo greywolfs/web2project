@@ -18,6 +18,12 @@ if ($AppUI->user_is_admin || $AppUI->user_is_controller) { // Only sysadmins or 
 	}
 }
 
+$projectPriorityFilter=array('not selected','low','normal','high');
+if (isset($_POST['projectPriorityFilterChoose'])) {
+	$AppUI->setState('projectPriorityIdxFilter', $_POST['projectPriorityFilterChoose']);
+}
+$projectPriorityFilterChoose = $AppUI->getState('projectPriorityIdxFilter') ? $AppUI->getState('projectPriorityIdxFilter') : 'not_selected';
+
 if (isset($_POST['f'])) {
 	$AppUI->setState('TaskIdxFilter', $_POST['f']);
 }
@@ -84,6 +90,9 @@ $titleBlock->addCell($AppUI->_('Departments') . ':');
 
 $titleBlock->addCell('<form action="?m=tasks" method="post" name="companyFilter" accept-charset="utf-8">' . arraySelect($filters2, 'f2', 'size="1" class="text" onChange="document.companyFilter.submit();"', $f2, false) . '</form>');
 $titleBlock->addCell($AppUI->_('Company') . ':');
+
+$titleBlock->addCell('<form action="?m=tasks" method="post" name="projectPriorityFilter" accept-charset="utf-8">' . arraySelect($projectPriorityFilter, 'projectPriorityFilterChoose', 'size="1" class="text" onChange="document.projectPriorityFilter.submit();"', $projectPriorityFilterChoose, true) . '</form>');
+$titleBlock->addCell($AppUI->_('Project priority') . ':');
 
 if ($canEdit && $project_id) {
 	$titleBlock->addCell('<form action="?m=tasks&amp;a=addedit&amp;task_project=' . $project_id . '" method="post" accept-charset="utf-8"><input type="submit" class="button" value="' . $AppUI->_('new task') . '"></form>');

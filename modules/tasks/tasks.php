@@ -288,6 +288,18 @@ switch ($f) {
 		break;
 }
 
+switch ($projectPriorityFilterChoose){
+	case 1:
+		$q->addWhere('project_priority=-1');
+		break;
+	case 2:
+		$q->addWhere('project_priority=0');
+		break;
+	case 3:
+		$q->addWhere('project_priority=1');
+		break;
+}
+
 if ($showIncomplete) {
 	$q->addWhere('( tasks.task_percent_complete < 100 OR tasks.task_percent_complete IS NULL)');
 }
