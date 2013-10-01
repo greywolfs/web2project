@@ -140,6 +140,7 @@
 'Not Applicable',
 'Not Defined',
 'Not implemented',
+'not selected',
 'November',
 'October',
 'On Hold',

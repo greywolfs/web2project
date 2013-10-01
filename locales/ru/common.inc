@@ -111,6 +111,7 @@
 'Not Applicable'=>'Не применимо',
 'Not Defined'=>'Не определено',
 'Not implemented'=>'Не применено',
+'not selected'=>'не выбрано',
 'November'=>'Ноябрь',
 'OVERDUE'=>'просрочена на',
 'October'=>'Октябрь',
