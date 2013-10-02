@@ -36,6 +36,9 @@ function expand(id){
   var element = document.getElementById(id);
   element.style.display = (element.style.display == '' || element.style.display == 'none') ? 'block' : 'none';
 }
+$(document).ready(function() {
+	$('.fancybox').fancybox();
+});
 </script>
 <table class="tbl list">
     <?php

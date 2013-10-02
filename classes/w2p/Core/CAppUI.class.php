@@ -1189,6 +1189,8 @@ class w2p_Core_CAppUI
         // additionally load jquery
         echo '<script type="text/javascript" src="' . $base . 'lib/jquery/jquery.js"></script>';
         echo '<script type="text/javascript" src="' . $base . 'lib/jquery/jquery.tipTip.js"></script>';
+		echo '<script type="text/javascript" src="' . $base . 'lib/fancyBox/jquery.fancybox.pack.js"></script>';
+		echo '<link rel="stylesheet" type="text/css" href="' . $base . 'lib/fancyBox/jquery.fancybox.css" media="screen" />';
 
 		// Load the basic javascript used by all modules.
 		echo '<script type="text/javascript" src="' . $base . 'js/base.js"></script>';

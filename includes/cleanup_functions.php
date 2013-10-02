@@ -2161,6 +2161,13 @@ function displayFiles($AppUI, $folder_id, $task_id, $project_id, $company_id) {
             if ('file_version' == $fieldList[$index]) {
                 $cell = str_replace('</td>', $version_link.'</td>', $cell);
             }
+			if ($column=='file_name' && strpos($row['file_type'],'image')!==false){
+				$file_date=new w2p_Utilities_Date($AppUI->formatTZAwareTime($row['file_date'], '%Y-%m-%d %T'));
+				$file_title = $file_date->format($htmlHelper->dtf);
+				$file_title .= (!empty($row['file_description']))?' - ' . $row['file_description']:'';
+				$cell = str_replace('href','class="fancybox" data-fancybox-group="gallery" title="' . $file_title . '" href',$cell);
+				$cell = str_replace('"><img src','&fname=.jpg"><img src',$cell);
+			}
             $s .= $cell;
         }
 
