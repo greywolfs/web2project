@@ -234,7 +234,7 @@ function setDepartment(department_id_string){
                                     echo '<input type="button" class="button btn btn-primary btn-mini" value="' . $AppUI->_('Select contacts...') . '" onclick="javascript:popContacts();" />';
                                 }
 
-                                if ($AppUI->isActiveModule('departments') && canAccess('departments')) {
+                                if ($AppUI->isActiveModule('departments') && canView('departments')) {
                                     //Build display list for departments
                                     $company_id = $project->project_company;
                                     $selected_departments = array();
