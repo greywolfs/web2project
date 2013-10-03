@@ -157,7 +157,8 @@ function setContacts(contact_id_string){
 	document.editFrm.project_contacts.value = contact_id_string;
 }
 
-function popDepartment() {
+function popDepartment()
+	$search_text = addslashes($search_text){project_name;
         var f = document.editFrm;
 	var url = './index.php?m=public&a=selector&dialog=1&callback=setDepartment&table=departments&company_id='
             + f.project_company.options[f.project_company.selectedIndex].value;
@@ -187,7 +188,7 @@ function setDepartment(department_id_string){
                     <tr>
                         <td align="right" nowrap="nowrap"><?php echo $AppUI->_('Project Name'); ?></td>
                         <td width="100%" colspan="2">
-                            <input type="text" name="project_name" id="project_name" value="<?php echo htmlspecialchars($project->project_name, ENT_QUOTES); ?>" size="25" maxlength="255" onblur="setShort();" class="text" /> *
+                            <input style="width:95%;" type="text" name="project_name" id="project_name" value="<?php echo htmlspecialchars($project->project_name, ENT_QUOTES); ?>" size="25" maxlength="255" onblur="setShort();" class="text" /> *
                         </td>
                     </tr>
                     <tr>
