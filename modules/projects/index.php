@@ -62,20 +62,16 @@ $bufferSearch = '<input type="text" class="text" size="20" name="projsearchtext"
 
 // setup the title block
 $titleBlock = new w2p_Theme_TitleBlock('Projects', 'applet3-48.png', $m, $m . '.' . $a);
-$titleBlock->addCell('<form action="?m=projects" method="post" name="searchfilter" accept-charset="utf-8">' . $bufferSearch . '</form>');
-$titleBlock->addCell($AppUI->_('Search') . ':');
-$titleBlock->addCell('<form action="?m=projects" method="post" name="typeIdForm" accept-charset="utf-8">' .
+$titleBlock->addCell($AppUI->_('Search') . ':<form action="?m=projects" method="post" name="searchfilter" accept-charset="utf-8">' . $bufferSearch . '</form>');
+$titleBlock->addCell($AppUI->_('Type') . ':<form action="?m=projects" method="post" name="typeIdForm" accept-charset="utf-8">' .
         arraySelect($project_types, 'project_type', 'size="1" class="text" onChange="document.typeIdForm.submit();"', $project_type, false) .
         '</form>');
-$titleBlock->addCell($AppUI->_('Type') . ':');
-$titleBlock->addCell('<form action="?m=projects" method="post" name="pickCompany" accept-charset="utf-8">' .
+$titleBlock->addCell($AppUI->_('Company') . ':<form action="?m=projects" method="post" name="pickCompany" accept-charset="utf-8">' .
         arraySelect($allowedCompanies, 'project_company', 'size="1" class="text" onChange="document.pickCompany.submit();"', $company_id, false) .
         '</form>');
-$titleBlock->addCell($AppUI->_('Company') . ':');
-$titleBlock->addCell('<form action="?m=projects" method="post" name="userIdForm" accept-charset="utf-8">' .
+$titleBlock->addCell($AppUI->_('Owner') . ':<form action="?m=projects" method="post" name="userIdForm" accept-charset="utf-8">' .
         arraySelect($user_list, 'project_owner', 'size="1" class="text" onChange="document.userIdForm.submit();"', $owner, false) .
         '</form>');
-$titleBlock->addCell($AppUI->_('Owner') . ':');
 if ($canAuthor) {
 	$titleBlock->addCell('<input type="submit" class="button btn btn-small dropdown-toggle" value="' . $AppUI->_('new project') . '">', '', '<form action="?m=projects&a=addedit" method="post" accept-charset="utf-8">', '</form>');
 }

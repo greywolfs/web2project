@@ -75,28 +75,25 @@ if (isset($_POST['searchtext'])) {
 $search_text = $AppUI->getState('searchtext') ? $AppUI->getState('searchtext') : '';
 $search_text = w2PformSafe($search_text, true);
 
-$titleBlock->addCell('<form action="?m=tasks" method="post" id="searchfilter" accept-charset="utf-8"><input type="text" class="text" size="20" name="searchtext" onChange="document.searchfilter.submit();" value="' . $search_text . '" title="' . $AppUI->_('Search in name and description fields') . '"/></form>');
-$titleBlock->addCell($AppUI->_('Search') . ':');
+$titleBlock->addCell($AppUI->_('Search') . ':<form action="?m=tasks" method="post" id="searchfilter" accept-charset="utf-8"><input type="text" class="text" size="20" name="searchtext" onChange="document.searchfilter.submit();" value="' . $search_text . '" title="' . $AppUI->_('Search in name and description fields') . '"/></form>');
 
 // Let's see if this user has admin privileges
 if ($AppUI->user_is_admin || $AppUI->user_is_controller) {
 	$user_list = $perms->getPermittedUsers('tasks');
-	$titleBlock->addCell('<form action="?m=tasks" method="post" name="userIdForm" accept-charset="utf-8">' . arraySelect($user_list, 'user_id', 'size="1" class="text" onChange="document.userIdForm.submit();"', $user_id, false) . '</form>');
-    $titleBlock->addCell($AppUI->_('User') . ':');
+	$titleBlock->addCell($AppUI->_('User') . ':<form action="?m=tasks" method="post" name="userIdForm" accept-charset="utf-8">' . arraySelect($user_list, 'user_id', 'size="1" class="text" onChange="document.userIdForm.submit();"', $user_id, false) . '</form>');
 }
 
-$titleBlock->addCell('<form action="?m=tasks" method="post" name="departmentsFilter" accept-charset="utf-8">' . arraySelect($sDepartmentsFilterArray, 'sDepartmentsFilter', 'class="text" onChange="document.departmentsFilter.submit();"', $sDepartmentsFilter, false) . arraySelect($departmentList, 'fDepartmentsFilter', 'size="1" style="max-width: 125px;" class="text" onChange="document.departmentsFilter.submit();"', $fDepartmentsFilter, false) . '</form>');
-$titleBlock->addCell($AppUI->_('Departments') . ':');
+$titleBlock->addCell($AppUI->_('Departments') . ':<form action="?m=tasks" method="post" name="departmentsFilter" accept-charset="utf-8">' . arraySelect($sDepartmentsFilterArray, 'sDepartmentsFilter', 'class="text" onChange="document.departmentsFilter.submit();"', $sDepartmentsFilter, false) . arraySelect($departmentList, 'fDepartmentsFilter', 'size="1" style="max-width: 125px;" class="text" onChange="document.departmentsFilter.submit();"', $fDepartmentsFilter, false) . '</form>');
 
-$titleBlock->addCell('<form action="?m=tasks" method="post" name="companyFilter" accept-charset="utf-8">' . arraySelect($filters2, 'f2', 'size="1" class="text" onChange="document.companyFilter.submit();"', $f2, false) . '</form>');
-$titleBlock->addCell($AppUI->_('Company') . ':');
+$titleBlock->addCell($AppUI->_('Company') . ':<form action="?m=tasks" method="post" name="companyFilter" accept-charset="utf-8">' . arraySelect($filters2, 'f2', 'size="1" class="text" onChange="document.companyFilter.submit();"', $f2, false) . '</form>');
 
-$titleBlock->addCell('<form action="?m=tasks" method="post" name="projectPriorityFilter" accept-charset="utf-8">' . arraySelect($projectPriorityFilter, 'projectPriorityFilterChoose', 'size="1" class="text" onChange="document.projectPriorityFilter.submit();"', $projectPriorityFilterChoose, true) . '</form>');
-$titleBlock->addCell($AppUI->_('Project priority') . ':');
+$titleBlock->addCell($AppUI->_('Project priority') . ':<form action="?m=tasks" method="post" name="projectPriorityFilter" accept-charset="utf-8">' . arraySelect($projectPriorityFilter, 'projectPriorityFilterChoose', 'size="1" class="text" onChange="document.projectPriorityFilter.submit();"', $projectPriorityFilterChoose, true) . '</form>');
 
 if ($canEdit && $project_id) {
 	$titleBlock->addCell('<form action="?m=tasks&amp;a=addedit&amp;task_project=' . $project_id . '" method="post" accept-charset="utf-8"><input type="submit" class="button" value="' . $AppUI->_('new task') . '"></form>');
 }
+
+$titleBlock->addCell($AppUI->_('Task Filter') . ':<form action="?m=tasks" method="post" name="taskFilter" accept-charset="utf-8">' . arraySelect($filters, 'f', 'size="1" class="text" onChange="document.taskFilter.submit();"', $f, true) . '</form>');
 
 if (w2PgetParam($_GET, 'inactive', '') == 'toggle') {
 	$AppUI->setState('inactive', $AppUI->getState('inactive') == -1 ? 0 : -1);
@@ -104,8 +101,6 @@ if (w2PgetParam($_GET, 'inactive', '') == 'toggle') {
 $in = $AppUI->getState('inactive') == -1 ? '' : 'in';
 
 $titleBlock->showhelp = false;
-$titleBlock->addCell('<form action="?m=tasks" method="post" name="taskFilter" accept-charset="utf-8">' . arraySelect($filters, 'f', 'size="1" class="text" onChange="document.taskFilter.submit();"', $f, true) . '</form>');
-$titleBlock->addCell($AppUI->_('Task Filter') . ':');
 
 $titleBlock->addCrumb('?m=tasks&amp;a=todo&amp;user_id=' . $user_id, 'my todo');
 if (w2PgetParam($_GET, 'pinned') == 1) {
