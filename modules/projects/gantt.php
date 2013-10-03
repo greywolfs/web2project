@@ -86,6 +86,7 @@ if ($showInactive != '1') {
 	}
 }
 $search_text = $AppUI->getState('projsearchtext') !== null ? $AppUI->getState('projsearchtext') : '';
+$search_text = addslashes($search_text);
 if (mb_trim($search_text)) {
     $q->addWhere('pr.project_name LIKE \'%' . $search_text . '%\' OR pr.project_description LIKE \'%' . $search_text . '%\'');
 }
