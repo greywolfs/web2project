@@ -103,6 +103,7 @@ $tl = $AppUI->getPref('TASKLOGEMAIL');
 $ta = $tl & 1;
 $tt = $tl & 2;
 $tp = $tl & 4;
+echo "\n";
 ?>
 <script language="javascript" type="text/javascript">
 
@@ -157,10 +158,9 @@ function setContacts(contact_id_string){
 	document.editFrm.project_contacts.value = contact_id_string;
 }
 
-function popDepartment()
-	$search_text = addslashes($search_text){project_name;
+function popDepartment(){
         var f = document.editFrm;
-	var url = './index.php?m=public&a=selector&dialog=1&callback=setDepartment&table=departments&company_id='
+		var url = './index.php?m=public&a=selector&dialog=1&callback=setDepartment&table=departments&company_id='
             + f.project_company.options[f.project_company.selectedIndex].value;
         window.open(url,'dept','left=50,top=50,height=600,width=400,resizable');
 }
