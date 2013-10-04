@@ -2396,7 +2396,7 @@ current viewing user $AppUI->user_id is used.
 function projects_list_data($user_id = false) {
 	global $AppUI, $addPwOiD, $buffer, $company, $company_id, $company_prefix,
         $deny, $department, $dept_ids, $orderby, $orderdir,
-        $tasks_problems, $owner, $search_text, $project_type;
+        $tasks_problems, $owner, $project_type;
 
 	$addProjectsWithAssignedTasks = $AppUI->getState('addProjWithTasks') ? $AppUI->getState('addProjWithTasks') : 0;
 
@@ -2531,8 +2531,9 @@ function projects_list_data($user_id = false) {
 	if ($owner > 0) {
 		$q->addWhere('pr.project_owner = ' . (int)$owner);
 	}
-	if (mb_trim($search_text)) {
-		$q->addWhere('pr.project_name LIKE \'%' . $search_text . '%\' OR pr.project_description LIKE \'%' . $search_text . '%\'');
+	$search_text = mb_trim(addslashes($AppUI->getState('projsearchtext')));
+	if (!empty($search_text)) {
+		$q->addWhere('(pr.project_name LIKE \'%' . $search_text . '%\' OR pr.project_description LIKE \'%' . $search_text . '%\')');
 	}
 	// Show Projects where the Project Owner is in the given department
 	if ($addPwOiD && !empty($owner_ids)) {
