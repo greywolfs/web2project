@@ -23,7 +23,9 @@ External used variables:
 * $f
 * $query_string
 */
-
+if (!$user_id){
+	$user_id = $AppUI->user_id;
+}
 if (empty($query_string)) {
 	$query_string = '?m=' . $m . '&amp;a=' . $a;
 }
