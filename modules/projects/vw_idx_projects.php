@@ -139,6 +139,7 @@ if (count($fields) > 0) {
 		<tr>
             <?php
             foreach ($fieldNames as $index => $name) {
+				if ($name=='Company') continue;
                 $column = ('project_color_identifier' == $fieldList[$index]) ? 'project_percent_complete' : $fieldList[$index];
                 ?><th>
                     <a href="?m=projects&orderby=<?php echo $column; ?>" class="hdr">
@@ -217,11 +218,12 @@ if (count($fields) > 0) {
 
                     $htmlHelper->stageRowData($row);
                     foreach ($fieldList as $field) {
+						if ($field=='project_company') continue;
                         $count_projects = $tmpProject->hasChildProjects($row['project_id']);
 
                         switch ($field) {
                             case 'project_name':
-                                $s .= '<td width="40%" class="data _name">';
+                                $s .= '<td style="width:60%" class="data _name">';
                                 if ($level) {
                                     $s .= str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', ($level - 1));
                                     $s .= '<img src="' . w2PfindImage('corner-dots.gif') . '" width="16" height="12" border="0">&nbsp;';
