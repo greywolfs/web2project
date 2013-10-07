@@ -304,6 +304,15 @@ if ($showIncomplete) {
 	$q->addWhere('( tasks.task_percent_complete < 100 OR tasks.task_percent_complete IS NULL)');
 }
 
+$project_create_date_start_filter=$AppUI->getState('project_create_date_start_filter');
+if (!empty ($project_create_date_start_filter) && $start_date=new w2p_Utilities_Date($project_create_date_start_filter)){
+	$q->addWhere("project_created>='".$start_date->format('%Y-%m-%d')."'");
+}
+$project_create_date_end_filter=$AppUI->getState('project_create_date_end_filter');
+if (!empty ($project_create_date_end_filter) && $end_date=new w2p_Utilities_Date($project_create_date_end_filter)){
+	$q->addWhere("project_created<='".$end_date->format('%Y-%m-%d')." 23:59:59'");
+}
+
 //TODO: This whole structure is hard-coded based on the TaskStatus SelectList.
 $task_status = 0;
 if ($min_view && isset($_GET['task_status'])) {

@@ -56,6 +56,8 @@
 'Copy'=>'Копировать',
 'Cost Code'=>'',
 'Creator'=>'Создатель',
+'created project(interval)'=>'Дата создания проекта(промежуток)',
+'set'=>'установить',
 'Current Assignees'=>'Текущие назначения',
 'Current tasks for the project'=>'Текущие задачи по проекту',
 'Daily Working Hours'=>'Рабочих часов в дне',

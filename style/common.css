@@ -164,13 +164,13 @@ form {
 }
 
 .module-title .crumb-right {
-    float: right;
+    /*float: right;*/
     margin: 10px 0;
 }
 
 .module-nav {
     float: left;
-    margin: -15px 0 5px;
+    /*margin: -15px 0 5px;*/
     width: 100%;
 }
 

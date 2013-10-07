@@ -4,6 +4,7 @@ if (!defined('W2P_BASE_DIR')) {
 }
 
 $AppUI->savePlace();
+$AppUI->loadCalendarJS();
 $perms = &$AppUI->acl();
 // retrieve any state parameters
 $user_id = $AppUI->user_id;
@@ -40,6 +41,12 @@ $f2 = ($AppUI->getState('CompanyIdxFilter')) ? $AppUI->getState('CompanyIdxFilte
 if (isset($_POST['fDepartmentsFilter'])) {
 	$AppUI->setState('fDepartmentsFilter', (int)$_POST['fDepartmentsFilter']);
 	$AppUI->setState('sDepartmentsFilter', $_POST['sDepartmentsFilter']);
+}
+if (isset($_POST['project_create_date_start'])) {
+	$AppUI->setState('project_create_date_start_filter', $_POST['project_create_date_start']);
+}
+if (isset($_POST['project_create_date_end'])) {
+	$AppUI->setState('project_create_date_end_filter', $_POST['project_create_date_end']);
 }
 $fDepartmentsFilter = $AppUI->getState('fDepartmentsFilter') ? $AppUI->getState('fDepartmentsFilter') :	'0';
 $sDepartmentsFilter = $AppUI->getState('sDepartmentsFilter') ? $AppUI->getState('sDepartmentsFilter') :	'only';
@@ -88,6 +95,34 @@ $titleBlock->addCell($AppUI->_('Departments') . ':<form action="?m=tasks" method
 $titleBlock->addCell($AppUI->_('Company') . ':<form action="?m=tasks" method="post" name="companyFilter" accept-charset="utf-8">' . arraySelect($filters2, 'f2', 'size="1" class="text" onChange="document.companyFilter.submit();"', $f2, false) . '</form>');
 
 $titleBlock->addCell($AppUI->_('Project priority') . ':<form action="?m=tasks" method="post" name="projectPriorityFilter" accept-charset="utf-8">' . arraySelect($projectPriorityFilter, 'projectPriorityFilterChoose', 'size="1" class="text" onChange="document.projectPriorityFilter.submit();"', $projectPriorityFilterChoose, true) . '</form>');
+
+$project_create_date_start_filter=$AppUI->getState('project_create_date_start_filter');
+$project_create_date_start_filter_text='';
+if (!empty ($project_create_date_start_filter) && $start_date=new w2p_Utilities_Date($project_create_date_start_filter)){
+	$project_create_date_start_filter=$start_date->format('%Y%m%d');
+	$project_create_date_start_filter_text=$start_date->format($AppUI->getPref('SHDATEFORMAT'));
+}
+$project_create_date_end_filter=$AppUI->getState('project_create_date_end_filter');
+$project_create_date_end_filter_text='';
+if (!empty ($project_create_date_end_filter) && $end_date=new w2p_Utilities_Date($project_create_date_end_filter)){
+	$project_create_date_end_filter=$end_date->format('%Y%m%d');
+	$project_create_date_end_filter_text=$end_date->format($AppUI->getPref('SHDATEFORMAT'));
+}
+$titleBlock->addCell($AppUI->_('created project(interval)').':<form name="project_create_date_form" id="project_create_date_form" method="post" accept-charset="utf-8">
+	<input type="hidden" name="datePicker" value="project_create">
+	<input type="hidden" name="project_create_date_start" id="project_create_date_start" value="'.$project_create_date_start_filter.'">
+	<input type="text" name="date_start" id="date_start" onchange="setDate_new(\'project_create_date_form\', \'date_start\');" value="'.$project_create_date_start_filter_text.'" class="text" style="">
+	<a href="javascript: void(0);" onclick="showCalendar(\'date_start\', \''.$AppUI->getPref('SHDATEFORMAT').'\', \'project_create_date_form\', null, true, true)">
+		<img src="'.w2PfindImage('calendar.gif').'" width="24" height="12" alt="'.$AppUI->_('Calendar').'" border="0">
+	</a> -
+	<input type="hidden" name="project_create_date_end" id="project_create_date_end" value="'.$project_create_date_end_filter.'">
+	<input type="text" name="date_end" id="date_end" onchange="setDate_new(\'project_create_date_form\', \'date_end\');" value="'.$project_create_date_end_filter_text.'" class="text" style="">
+	<a href="javascript: void(0);" onclick="showCalendar(\'date_end\', \''.$AppUI->getPref('SHDATEFORMAT').'\', \'project_create_date_form\', null, true, true)">
+		<img src="'.w2PfindImage('calendar.gif').'" width="24" height="12" alt="'.$AppUI->_('Calendar').'" border="0">
+	</a>
+	<button>'.$AppUI->_('set').'</button>
+	</form>
+');
 
 if ($canEdit && $project_id) {
 	$titleBlock->addCell('<form action="?m=tasks&amp;a=addedit&amp;task_project=' . $project_id . '" method="post" accept-charset="utf-8"><input type="submit" class="button" value="' . $AppUI->_('new task') . '"></form>');

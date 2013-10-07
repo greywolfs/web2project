@@ -55,6 +55,8 @@
 'Copy',
 'Cost Code',
 'Creator',
+'created project(interval)',
+'set',
 'Current Assignees',
 'Daily Working Hours',
 'Date',
