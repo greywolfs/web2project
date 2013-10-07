@@ -238,7 +238,7 @@ if (count($fields) > 0) {
                                     $s .= '<a href="./index.php?m=projects&a=view&project_id=' . $row["project_id"] . '">' . (nl2br($row['project_description']) ? w2PtoolTip($row[$field], nl2br($row['project_description']), true) : '') . $row[$field] . (nl2br($row['project_description']) ? w2PendTip() : '') . '</a>' . w2PendTip();
                                 } else {
                                     $s .= '<a href="./index.php?m=projects&a=view&project_id=' . $row["project_id"] . '">';
-                                    $s .= (nl2br($row['project_description']) ? w2PtoolTip($row[$field], nl2br($row['project_description']), true) : w2PtoolTip($row[$field], $AppUI->_('No information available'), true));
+                                    $s .= (!empty($row['project_description']) ? w2PtoolTip($row[$field], $row['project_description'], true) : w2PtoolTip($row[$field], $AppUI->_('No information available'), true));
                                     $s .= $row[$field] . (nl2br($row['project_description']) ? w2PendTip() : '') . '</a>';
                                 }
                                 $s .= '</td>';

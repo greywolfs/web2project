@@ -3849,9 +3849,9 @@ function w2PtoolTip($header = '', $tip = '', $raw = false, $id = '') {
 
     $id = ('' == $id) ? '' : 'id="' . $id . '"';
 	if ($raw) {
-		$starttip = '<span ' . $id . ' title="&lt;h4&gt;' . nl2br($AppUI->_($header)) . '&lt;/h4&gt; ' . nl2br($AppUI->_($tip)) . '">';
+		$starttip = '<span ' . $id . ' title="&lt;h4&gt;' . $AppUI->_($header) . '&lt;/h4&gt; ' . $AppUI->_($tip) . '">';
 	} else {
-		$starttip = '<span ' . $id . ' title="&lt;h4&gt;' . nl2br(ucwords(strtolower($AppUI->_($header)))) . '&lt;/h4&gt; ' . nl2br(strtolower($AppUI->_($tip))) . '">';
+		$starttip = '<span ' . $id . ' title="&lt;h4&gt;' . ucwords(strtolower($AppUI->_($header))) . '&lt;/h4&gt; ' . strtolower($AppUI->_($tip)) . '">';
 	}
 	return $starttip;
 }
