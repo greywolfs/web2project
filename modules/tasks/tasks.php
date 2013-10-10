@@ -210,7 +210,7 @@ if ($task_id) {
 	$f = 'deepchildren';
 }
 if ($pinned_only) {
-	$q->addWhere('tasks.task_pinned = 1');
+	$q->addWhere('pin.task_pinned = 1');
 }
 
 $f = (($f) ? $f : '');
