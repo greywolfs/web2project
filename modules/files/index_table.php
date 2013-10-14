@@ -20,6 +20,7 @@ if (($company_id || $project_id || $task_id) && !($m == 'files')) {
 } else {
 	// TODO: the filtering is not working as expected in the flat view
     $category_id = ($tab < 0) ? 0 : $tab + 1;
+	$tab = ($tab < 0) ? 0 : $tab + 1;
 }
 
 $xpg_pagesize = w2PgetConfig('page_size', 50);
@@ -28,7 +29,8 @@ $xpg_min = $xpg_pagesize * ($page - 1); // This is where we start our record set
 // counts total recs from selection
 $fileList = CFile::getFileList($AppUI, $company_id, $project_id, $task_id);
 $xpg_totalrecs = count($fileList);
-$pageNav = buildPaginationNav($AppUI, $m, $tab, $xpg_totalrecs, $xpg_pagesize, $page, '&amp;a=view&amp;project_id='.$project_id);
+$dop=$project_id?'&amp;a=view&amp;project_id='.$project_id:'';
+$pageNav = buildPaginationNav($AppUI, $m, $tab, $xpg_totalrecs, $xpg_pagesize, $page, $dop);
 echo $pageNav;
 ?>
 <script language="javascript" type="text/javascript">
