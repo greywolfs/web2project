@@ -26,9 +26,9 @@ $xpg_pagesize = w2PgetConfig('page_size', 50);
 $xpg_min = $xpg_pagesize * ($page - 1); // This is where we start our record set from
 
 // counts total recs from selection
-$fileList = CFile::getFileList($AppUI, $company_id, $project_id, $task_id, $tab);
+$fileList = CFile::getFileList($AppUI, $company_id, $project_id, $task_id);
 $xpg_totalrecs = count($fileList);
-$pageNav = buildPaginationNav($AppUI, $m, $tab+1, $xpg_totalrecs, $xpg_pagesize, $page);
+$pageNav = buildPaginationNav($AppUI, $m, $tab, $xpg_totalrecs, $xpg_pagesize, $page, '&amp;a=view&amp;project_id='.$project_id);
 echo $pageNav;
 ?>
 <script language="javascript" type="text/javascript">

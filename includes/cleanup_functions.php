@@ -3323,7 +3323,7 @@ function w2PshowImage($src, $wid = '', $hgt = '', $alt = '', $title = '', $modul
 // $xpg_sqlquery    - SELECT for the SELECT LIMIT
 // $xpg_result      - pointer to results from SELECT LIMIT
 
-function buildPaginationNav($AppUI, $m, $tab, $xpg_totalrecs, $xpg_pagesize, $page) {
+function buildPaginationNav($AppUI, $m, $tab, $xpg_totalrecs, $xpg_pagesize, $page, $dop='') {
   $xpg_total_pages = ($xpg_totalrecs > $xpg_pagesize) ? ceil($xpg_totalrecs / $xpg_pagesize) : 0;
 
   $xpg_break = false;
@@ -3336,8 +3336,8 @@ function buildPaginationNav($AppUI, $m, $tab, $xpg_totalrecs, $xpg_pagesize, $pa
     $xpg_next_page = $page + 1;
     // left buttoms
     if ($xpg_prev_page > 0) {
-      $s .= '<td align="left" width="15%"><a href="./index.php?m=' . $m . '&amp;tab=' . $tab . '&amp;page=1"><img src="' . w2PfindImage('navfirst.gif') . '" border="0" Alt="First Page"></a>&nbsp;&nbsp;';
-      $s .= '<a href="./index.php?m=' . $m . '&amp;tab=' . $tab . '&amp;page=' . $xpg_prev_page . '"><img src="' . w2PfindImage('navleft.gif') . '" border="0" Alt="Previous page (' . $xpg_prev_page . ')"></a></td>';
+      $s .= '<td align="left" width="15%"><a href="./index.php?m=' . $m . $dop . '&amp;tab=' . $tab . '&amp;page=1"><img src="' . w2PfindImage('navfirst.gif') . '" border="0" Alt="First Page"></a>&nbsp;&nbsp;';
+      $s .= '<a href="./index.php?m=' . $m . $dop . '&amp;tab=' . $tab . '&amp;page=' . $xpg_prev_page . '"><img src="' . w2PfindImage('navleft.gif') . '" border="0" Alt="Previous page (' . $xpg_prev_page . ')"></a></td>';
     } else {
       $s .= '<td width="15%">&nbsp;</td>';
     }
@@ -3353,7 +3353,7 @@ function buildPaginationNav($AppUI, $m, $tab, $xpg_totalrecs, $xpg_pagesize, $pa
       if ($n == $page) {
         $s .= '<b>' . $n . '</b></a>';
       } else {
-        $s .= '<a href="./index.php?m=' . $m . '&amp;tab=' . $tab . '&amp;page=' . $n . '">' . $n . '</a>';
+        $s .= '<a href="./index.php?m=' . $m . $dop . '&amp;tab=' . $tab . '&amp;page=' . $n . '">' . $n . '</a>';
       }
       if ($n >= 30 + $page - 15) {
         $xpg_break = true;
@@ -3367,15 +3367,15 @@ function buildPaginationNav($AppUI, $m, $tab, $xpg_totalrecs, $xpg_pagesize, $pa
       if ($n == $page) {
         $s .= '<' . $n . '</a>';
       } else {
-        $s .= '<a href="./index.php?m=' . $m . '&amp;tab=' . $tab . '&amp;page=' . $xpg_total_pages . '">' . $n . '</a>';
+        $s .= '<a href="./index.php?m=' . $m . $dop . '&amp;tab=' . $tab . '&amp;page=' . $xpg_total_pages . '">' . $n . '</a>';
       }
     }
     $s .= ' ] ';
     $s .= '</td>';
     // right buttoms
     if ($xpg_next_page <= $xpg_total_pages) {
-      $s .= '<td align="right" width="15%"><a href="./index.php?m=' . $m . '&amp;tab=' . $tab . '&amp;page=' . $xpg_next_page . '"><img src="' . w2PfindImage('navright.gif') . '" border="0" Alt="Next Page (' . $xpg_next_page . ')"></a>&nbsp;&nbsp;';
-      $s .= '<a href="./index.php?m=' . $m . '&amp;tab=' . $tab . '&amp;page=' . $xpg_total_pages . '"><img src="' . w2PfindImage('navlast.gif') . '" border="0" Alt="Last Page"></a></td>';
+      $s .= '<td align="right" width="15%"><a href="./index.php?m=' . $m . $dop . '&amp;tab=' . $tab . '&amp;page=' . $xpg_next_page . '"><img src="' . w2PfindImage('navright.gif') . '" border="0" Alt="Next Page (' . $xpg_next_page . ')"></a>&nbsp;&nbsp;';
+      $s .= '<a href="./index.php?m=' . $m . $dop . '&amp;tab=' . $tab . '&amp;page=' . $xpg_total_pages . '"><img src="' . w2PfindImage('navlast.gif') . '" border="0" Alt="Last Page"></a></td>';
     } else {
       $s .= '<td width="15%">&nbsp;</td></tr>';
     }
