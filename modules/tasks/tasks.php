@@ -343,7 +343,8 @@ if (isset($task_owner) && (int) $task_owner > 0) {
 if (($project_id || !$task_id) && !$min_view) {
 	if ($search_text = $AppUI->getState('searchtext')) {
 		$search_text = addslashes($search_text);
-		$q->addWhere('( tasks.task_name LIKE (\'%' . $search_text . '%\') OR tasks.task_description LIKE (\'%' . $search_text . '%\') )');
+		$q->addWhere('( tasks.task_name LIKE (\'%' . $search_text . '%\') OR tasks.task_description LIKE (\'%' . $search_text . '%\')
+			or p.project_name LIKE (\'%' . $search_text . '%\')  or p.project_description LIKE (\'%' . $search_text . '%\') )');
 	}
 }
 
