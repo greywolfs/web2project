@@ -102,12 +102,12 @@ $q->clear();
         </tr>
         <tr>
             <td>
-                <select name="all_tasks" class="text" style="width:220px" size="10" class="text" multiple="multiple">
+                <select name="all_tasks" class="text" style="min-width:220px" size="10" class="text" multiple="multiple">
                     <?php echo str_replace('selected', '', $task_parent_options); // we need to remove selected added from task_parent options ?>
                 </select>
             </td>
             <td>
-                <?php echo arraySelect($taskDep, 'task_dependencies', 'style="width:220px" size="10" class="text" multiple="multiple" ', null); ?>
+                <?php echo arraySelect($taskDep, 'task_dependencies', 'style="min-width:220px" size="10" class="text" multiple="multiple" ', null); ?>
             </td>
         </tr>
         <tr>

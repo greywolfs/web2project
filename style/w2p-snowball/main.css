@@ -58,6 +58,7 @@ div.shadow {
 	font-family: arial,Osaka,verdana,Sans-Serif;
 	font-size: 8pt;
     margin-top  : 2px;
+	max-width: 450px;
 }
 
 .textarea {
